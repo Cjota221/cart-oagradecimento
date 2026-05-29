@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Cartões Frente e Verso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Configurações da folha A4 virtual na tela */
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            position: relative;
+            /* Centraliza o conteúdo (a grade) perfeitamente no meio da folha */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: white;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .a4-page.landscape {
+            width: 297mm;
+            height: 210mm;
+        }
+
+        /* A grade que segura os cartões */
+        .card-grid {
+            display: grid;
+            /* O tamanho da grade será definido via JavaScript com base nas margens e tamanhos */
+            width: 100%;
+            height: 100%;
+            padding: 10mm; /* Margem de segurança da impressora */
+        }
+
+        .card-item {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Mantém a proporção da arte sem cortar */
+            /* Se preferir que a arte preencha o espaço cortando bordas, mude para 'cover' */
+        }
+
+        /* Auxiliar visual para ver o corte (não aparece na impressão final) */
+        .show-guidelines .card-item-wrapper {
+            border: 1px dashed #cbd5e1;
+            padding: 2px;
+        }
+
+        /* --- NOVO: Lógica de exibição no Modo de Impressão (Tela e Papel) --- */
+        body.printing-front #page-back,
+        body.printing-back #page-front,
+        body.printing-front .sidebar, body.printing-back .sidebar,
+        body.printing-front header, body.printing-back header,
+        body.printing-front .instructions-panel, body.printing-back .instructions-panel {
+            display: none !important;
+        }
+        
+        body.printing-front section, body.printing-back section {
+            background-color: #f3f4f6; /* Mantém um fundinho na tela */
+        }
+
+        /* * A MÁGICA DA IMPRESSÃO 
+         * Quando chamamos window.print(), o CSS abaixo entra em ação.
+         */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0; /* Remove margens do navegador */
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+
+            /* Esconde tudo que é da interface do site */
+            .no-print, header, .sidebar, .instructions-panel {
+                display: none !important;
+            }
+
+            body.printing-front section, body.printing-back section {
+                background-color: white; 
+                padding: 0;
+            }
+
+            /* Remove sombras e margens da folha virtual para impressão real */
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+                page-break-after: always;
+                transform: none !important; /* Ignora o scale do JS na impressão */
+            }
+
+            /* Remove as linhas guia na hora de imprimir de verdade */
+            .card-item-wrapper { border: none !important; padding: 0 !important; }
+        }
+
+        /* Scrollbar bonitinha */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- NOVO: Banner de Controle Manual de Impressão -->
+    <div id="print-mode-controls" class="hidden fixed top-4 right-4 z-[999] no-print">
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 p-4 rounded-lg shadow-2xl flex flex-col items-center gap-3">
+            <span class="text-sm text-center">Se a janela de impressão não abrir,<br>pressione <b>Ctrl + P</b> no seu teclado.</span>
+            <button onclick="exitPrintMode()" class="bg-white border border-yellow-400 px-4 py-2 rounded hover:bg-yellow-50 text-sm font-bold shadow-sm w-full transition">
+                <i class="fas fa-arrow-left mr-2"></i> Voltar para Edição
+            </button>
+        </div>
+    </div>
+
+    <header class="bg-indigo-600 text-white shadow-md p-4 flex justify-between items-center z-10 no-print flex-shrink-0">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-print text-2xl"></i>
+            <div>
+                <h1 class="text-xl font-bold leading-tight">PrintMaster Frente e Verso</h1>
+                <p class="text-indigo-200 text-xs">Alinhamento perfeito automático para A4</p>
+            </div>
+        </div>
+        <div class="flex gap-4 text-sm font-medium">
+            <button onclick="showInstructions()" class="hover:text-indigo-200 transition"><i class="fas fa-question-circle mr-1"></i> Como usar</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden w-full">
+        
+        <!-- SIDEBAR DE CONFIGURAÇÕES -->
+        <aside class="sidebar w-80 bg-white shadow-xl flex flex-col z-10 h-full overflow-y-auto no-print">
+            <div class="p-6 flex-1">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Configurações</h2>
+                
+                <!-- Orientação da Página -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Orientação da Folha A4</label>
+                    <select id="page-orientation" class="w-full border border-gray-300 rounded p-2 text-sm bg-white" onchange="updateOrientation()">
+                        <option value="portrait">Retrato (Em pé)</option>
+                        <option value="landscape">Paisagem (Deitada)</option>
+                    </select>
+                </div>
+
+                <!-- Upload Frente -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">1. Imagem da FRENTE</label>
+                    <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 text-center hover:bg-indigo-50 transition cursor-pointer relative overflow-hidden group mb-2">
+                        <input type="file" id="upload-front" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleImageUpload(event, 'front')">
+                        <div id="front-preview-container" class="hidden absolute inset-0 z-10 bg-white p-1">
+                            <img id="front-thumbnail" src="" class="w-full h-full object-contain">
+                        </div>
+                        <i class="fas fa-cloud-upload-alt text-indigo-400 text-3xl mb-2"></i>
+                        <p class="text-sm text-gray-500">Clique ou arraste a arte</p>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="rotate-front" class="w-4 h-4 text-indigo-600 rounded" onchange="generateGrids()">
+                        <label for="rotate-front" class="ml-2 text-xs text-gray-700 cursor-pointer">Rotacionar arte 90º</label>
+                    </div>
+                </div>
+
+                <!-- Upload Verso -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">2. Imagem do VERSO</label>
+                    <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 text-center hover:bg-indigo-50 transition cursor-pointer relative overflow-hidden group mb-2">
+                        <input type="file" id="upload-back" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleImageUpload(event, 'back')">
+                        <div id="back-preview-container" class="hidden absolute inset-0 z-10 bg-white p-1">
+                            <img id="back-thumbnail" src="" class="w-full h-full object-contain">
+                        </div>
+                        <i class="fas fa-cloud-upload-alt text-indigo-400 text-3xl mb-2"></i>
+                        <p class="text-sm text-gray-500">Clique ou arraste a arte</p>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="rotate-back" class="w-4 h-4 text-indigo-600 rounded" onchange="generateGrids()">
+                        <label for="rotate-back" class="ml-2 text-xs text-gray-700 cursor-pointer">Rotacionar arte 90º</label>
+                    </div>
+                </div>
+
+                <!-- Configuração de Grade -->
+                <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3"><i class="fas fa-th mr-2"></i>Grade na Folha A4</label>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Colunas</label>
+                            <input type="number" id="cols" value="3" min="1" max="10" class="w-full border border-gray-300 rounded p-2 text-center" onchange="generateGrids()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Linhas</label>
+                            <input type="number" id="rows" value="3" min="1" max="10" class="w-full border border-gray-300 rounded p-2 text-center" onchange="generateGrids()">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">Espaçamento entre cartões (mm)</label>
+                        <input type="number" id="gap" value="5" min="0" max="50" class="w-full border border-gray-300 rounded p-2 text-center" onchange="generateGrids()">
+                    </div>
+                </div>
+
+                <!-- Tamanho Ideal da Arte (NOVO) -->
+                <div class="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h3 class="text-sm font-bold text-blue-800 mb-2"><i class="fas fa-ruler-combined mr-2"></i>Tamanho Ideal da Arte</h3>
+                    <p class="text-xs text-blue-700 mb-2">Para criar no Canva/Photoshop, use exatamente:</p>
+                    <div class="font-mono text-sm font-bold text-blue-900 bg-white p-2 rounded border border-blue-200 text-center mb-1" id="ideal-size-mm">
+                        -- mm x -- mm
+                    </div>
+                    <div class="text-center text-xs text-blue-600 font-medium" id="ideal-size-px">
+                        (-- px x -- px a 300 DPI)
+                    </div>
+                </div>
+
+                <!-- Opções Visuais -->
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" id="show-guidelines" checked class="w-4 h-4 text-indigo-600 rounded" onchange="toggleGuidelines()">
+                    <label for="show-guidelines" class="ml-2 text-sm text-gray-700 cursor-pointer">Mostrar linhas de corte (pontilhado)</label>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200 gap-3 flex flex-col">
+                <button onclick="triggerPrint('front')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded shadow transition flex justify-center items-center gap-2">
+                    <i class="fas fa-print"></i> 1º Imprimir FRENTE
+                </button>
+                <button onclick="triggerPrint('back')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded shadow transition flex justify-center items-center gap-2">
+                    <i class="fas fa-sync-alt"></i> 2º Imprimir VERSO
+                </button>
+            </div>
+        </aside>
+
+        <section class="flex-1 bg-gray-200 overflow-y-auto p-8 flex flex-col items-center gap-12 relative">
+            
+            <!-- Painel de Instruções Rapidas -->
+            <div id="instructions-panel" class="instructions-panel w-full max-w-4xl bg-yellow-50 border border-yellow-200 rounded-lg p-4 shadow-sm text-yellow-800 text-sm mb-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-yellow-500 text-xl mt-0.5"></i>
+                    <div>
+                        <h3 class="font-bold mb-1">Como ter o alinhamento perfeito:</h3>
+                        <p>1. O segredo é que <b>a grade é centralizada matematicamente</b>. Não altere as margens na hora de imprimir.</p>
+                        <p>2. Clique em "Imprimir Frente". Na janela da impressora, defina <b>Tamanho do Papel: A4</b> e <b>Margens: Nenhuma/Mínima</b>.</p>
+                        <p>3. Pegue a folha impressa, vire-a como a página de um livro (eixo longo), coloque na impressora e clique em "Imprimir Verso".</p>
+                    </div>
+                    <button onclick="document.getElementById('instructions-panel').style.display='none'" class="ml-auto text-yellow-500 hover:text-yellow-700"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <!-- Folha FRENTE -->
+            <div class="w-full flex flex-col items-center">
+                <h2 class="text-gray-500 font-bold mb-3 no-print tracking-widest uppercase">Visualização: FRENTE</h2>
+                <!-- O transform scale é usado para caber telas menores, mas via JS ajustamos -->
+                <div id="page-front" class="a4-page show-guidelines" style="transform-origin: top center;">
+                    <div id="grid-front" class="card-grid">
+                        <!-- Os cartões da frente serão injetados aqui via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Folha VERSO -->
+            <div class="w-full flex flex-col items-center pb-20">
+                <h2 class="text-gray-500 font-bold mb-3 no-print tracking-widest uppercase">Visualização: VERSO</h2>
+                <div id="page-back" class="a4-page show-guidelines" style="transform-origin: top center;">
+                    <div id="grid-back" class="card-grid">
+                        <!-- Os cartões do verso serão injetados aqui via JS -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        // Imagens padrão de placeholder
+        const PLACEHOLDER_FRONT = 'https://placehold.co/400x600/4f46e5/ffffff?text=FRENTE\n(Sua+Arte)';
+        const PLACEHOLDER_BACK = 'https://placehold.co/400x600/059669/ffffff?text=VERSO\n(Sua+Arte)';
+
+        // Estado do aplicativo
+        let state = {
+            frontImage: PLACEHOLDER_FRONT,
+            backImage: PLACEHOLDER_BACK,
+            cols: 3,
+            rows: 3,
+            gap: 5,
+            orientation: 'portrait',
+            rotateFront: false,
+            rotateBack: false
+        };
+
+        // Função para lidar com o upload de imagens
+        function handleImageUpload(event, side) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgData = e.target.result;
+                if (side === 'front') {
+                    state.frontImage = imgData;
+                    document.getElementById('front-thumbnail').src = imgData;
+                    document.getElementById('front-preview-container').classList.remove('hidden');
+                } else {
+                    state.backImage = imgData;
+                    document.getElementById('back-thumbnail').src = imgData;
+                    document.getElementById('back-preview-container').classList.remove('hidden');
+                }
+                generateGrids();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Função principal que constrói a grade matemática nas folhas A4
+        function generateGrids() {
+            // Atualizar estado com valores dos inputs
+            state.cols = parseInt(document.getElementById('cols').value) || 1;
+            state.rows = parseInt(document.getElementById('rows').value) || 1;
+            state.gap = parseInt(document.getElementById('gap').value) || 0;
+
+            const gridFront = document.getElementById('grid-front');
+            const gridBack = document.getElementById('grid-back');
+
+            state.rotateFront = document.getElementById('rotate-front').checked;
+            state.rotateBack = document.getElementById('rotate-back').checked;
+
+            // --- NOVO: Cálculo do Tamanho Ideal da Arte ---
+            const isLandscape = state.orientation === 'landscape';
+            const pageWidth = isLandscape ? 297 : 210;
+            const pageHeight = isLandscape ? 210 : 297;
+            const pagePadding = 20; // 10mm de cada lado (definido no .card-grid)
+
+            const availableWidth = pageWidth - pagePadding;
+            const availableHeight = pageHeight - pagePadding;
+
+            // Calcula o tamanho de cada cartão em milímetros
+            let cardWidthMm = (availableWidth - ((state.cols - 1) * state.gap)) / state.cols;
+            let cardHeightMm = (availableHeight - ((state.rows - 1) * state.gap)) / state.rows;
+            
+            // Impede valores negativos se o usuário colocar um espaçamento absurdo
+            cardWidthMm = Math.max(0, cardWidthMm);
+            cardHeightMm = Math.max(0, cardHeightMm);
+
+            // Atualiza na tela (MM)
+            document.getElementById('ideal-size-mm').innerText = `${cardWidthMm.toFixed(1)} mm larg. × ${cardHeightMm.toFixed(1)} mm alt.`;
+
+            // Calcula o tamanho em Pixels para 300 DPI (alta qualidade de impressão)
+            // Fórmula: mm * (DPI / 25.4)
+            const cardWidthPx = Math.round(cardWidthMm * (300 / 25.4));
+            const cardHeightPx = Math.round(cardHeightMm * (300 / 25.4));
+            
+            // Atualiza na tela (PX)
+            document.getElementById('ideal-size-px').innerText = `(${cardWidthPx} px × ${cardHeightPx} px a 300 DPI)`;
+            // ----------------------------------------------
+
+            // Limpar grades atuais
+            gridFront.innerHTML = '';
+            gridBack.innerHTML = '';
+
+            // Configurar o estilo CSS Grid de acordo com as colunas, linhas e gap
+            const gridStyle = `
+                grid-template-columns: repeat(${state.cols}, 1fr);
+                grid-template-rows: repeat(${state.rows}, 1fr);
+                gap: ${state.gap}mm;
+            `;
+
+            gridFront.style.cssText = gridStyle;
+            gridBack.style.cssText = gridStyle;
+
+            const totalCards = state.cols * state.rows;
+
+            const frontClass = state.rotateFront ? 'card-item rotate-90' : 'card-item';
+            const backClass = state.rotateBack ? 'card-item rotate-90' : 'card-item';
+
+            // Injetar os cartões na Frente
+            for (let i = 0; i < totalCards; i++) {
+                gridFront.innerHTML += `
+                    <div class="card-item-wrapper flex items-center justify-center w-full h-full overflow-hidden">
+                        <img src="${state.frontImage}" class="${frontClass}" alt="Frente do Cartão">
+                    </div>
+                `;
+            }
+
+            // Injetar os cartões no Verso
+            /* 
+             * NOTA IMPORTANTE SOBRE O VERSO:
+             * Como estamos repetindo A MESMA imagem em todos os espaços, e a grade 
+             * está PERFEITAMENTE centralizada na página (devido ao display flex do .a4-page e o grid),
+             * não precisamos inverter a ordem das imagens via código. A impressora e o ato
+             * de virar a folha cuidarão para que a caixa [linha 1, col 1] da frente 
+             * caia exatamente sobre a caixa correspondente do verso. A simetria resolve o problema!
+             */
+            for (let i = 0; i < totalCards; i++) {
+                gridBack.innerHTML += `
+                    <div class="card-item-wrapper flex items-center justify-center w-full h-full overflow-hidden">
+                        <img src="${state.backImage}" class="${backClass}" alt="Verso do Cartão">
+                    </div>
+                `;
+            }
+            
+            // Atualiza a rotação nas thumbnails
+            document.getElementById('front-thumbnail').className = state.rotateFront ? 'w-full h-full object-contain rotate-90' : 'w-full h-full object-contain';
+            document.getElementById('back-thumbnail').className = state.rotateBack ? 'w-full h-full object-contain rotate-90' : 'w-full h-full object-contain';
+        }
+
+        
+        function toggleGuidelines() {
+            const isChecked = document.getElementById('show-guidelines').checked;
+            const pages = document.querySelectorAll('.a4-page');
+            pages.forEach(page => {
+                if(isChecked) page.classList.add('show-guidelines');
+                else page.classList.remove('show-guidelines');
+            });
+        }
+
+        function triggerPrint(side) {
+            // Adiciona classe ao body para esconder tudo, exceto a folha escolhida
+            document.body.classList.remove('printing-front', 'printing-back');
+            document.body.classList.add(`printing-${side}`);
+            
+            // Mostra o banner de aviso caso a janela seja bloqueada
+            document.getElementById('print-mode-controls').classList.remove('hidden');
+            
+            // Volta o scroll pro topo para garantir que a folha fique certa na impressão
+            document.querySelector('main > section').scrollTo({ top: 0 });
+            
+            // Pequeno delay para garantir que a renderização aplicou as classes
+            setTimeout(() => {
+                window.print();
+                
+                // Nota: Removemos o código que tirava a classe automaticamente.
+                // Agora o usuário precisa clicar em "Voltar para Edição" se a janela não abrir sozinha.
+            }, 500);
+        }
+
+        function exitPrintMode() {
+            // Remove as classes de impressão para voltar a tela normal
+            document.body.classList.remove('printing-front', 'printing-back');
+            document.getElementById('print-mode-controls').classList.add('hidden');
+        }
+
+        function showInstructions() {
+            // Em vez de alert(), criamos um modal amigável ou re-exibimos o painel
+            const panel = document.getElementById('instructions-panel');
+            panel.style.display = 'block';
+            // Scroll para o topo
+            document.querySelector('main > section').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateOrientation() {
+            const orientation = document.getElementById('page-orientation').value;
+            state.orientation = orientation;
+            
+            const pages = document.querySelectorAll('.a4-page');
+            pages.forEach(page => {
+                if (orientation === 'landscape') {
+                    page.classList.add('landscape');
+                } else {
+                    page.classList.remove('landscape');
+                }
+            });
+
+            // Atualiza a regra de impressão para a impressora saber que é paisagem
+            let styleEl = document.getElementById('print-page-style');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'print-page-style';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.innerHTML = `@media print { @page { size: A4 ${orientation}; } }`;
+
+            adjustScale();
+        }
+
+        function adjustScale() {
+            const section = document.querySelector('main > section');
+            const pages = document.querySelectorAll('.a4-page');
+            
+            // Largura disponível menos padding
+            const availableWidth = section.clientWidth - 64; 
+            
+            // Define a largura base do A4 em pixels (aprox 96dpi) dependendo da orientação
+            const isLandscape = state.orientation === 'landscape';
+            const a4WidthPx = isLandscape ? 1122 : 794; 
+            const a4HeightPx = isLandscape ? 794 : 1122;
+
+            let scale = 1;
+            if (availableWidth < a4WidthPx) {
+                scale = availableWidth / a4WidthPx;
+            }
+
+            // Aplicar escala apenas na tela, o @media print ignora isso
+            pages.forEach(page => {
+                page.style.transform = `scale(${scale})`;
+                // Ajustar margem inferior para compensar o scale e não encavalar
+                const scaledHeight = a4HeightPx * scale;
+                const heightDiff = a4HeightPx - scaledHeight;
+                page.style.marginBottom = `-${heightDiff}px`;
+            });
+        }
+
+        // Inicialização
+        window.onload = function() {
+            updateOrientation();
+            generateGrids();
+            adjustScale();
+        };
+
+        window.onresize = adjustScale;
+
+    </script>
+</body>
+</html>
