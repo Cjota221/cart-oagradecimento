@@ -33,8 +33,8 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-6 md:px-6">
-      <h1 className="mb-3 text-2xl font-extrabold text-[#1a0533]">Dashboard Imprimax</h1>
-      <p className="mb-5 text-sm text-[#1a0533]/70">
+      <h1 className="no-print mb-3 text-2xl font-extrabold text-[#1a0533]">Dashboard Imprimax</h1>
+      <p className="no-print mb-5 text-sm text-[#1a0533]/70">
         Seu acesso vitalício está ativo. Selecione um template premium ou envie suas próprias artes.
       </p>
       <CardGenerator enableTemplates templates={templates} hasAccess />

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import TemplateGallery, { TemplateItem } from "@/components/TemplateGallery";
@@ -33,9 +33,9 @@ export default function CardGenerator({
   const [currentView, setCurrentView] = useState<View>("front");
   const [showGuides, setShowGuides] = useState(true);
   const [zoom, setZoom] = useState(48);
-  const [isPrinting, setIsPrinting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loadingSide, setLoadingSide] = useState<Side | null>(null);
+  const zoomRef = useRef<HTMLDivElement | null>(null);
 
   const safeRows = Math.min(10, Math.max(1, rows));
   const safeCols = Math.min(10, Math.max(1, cols));
@@ -137,20 +137,25 @@ export default function CardGenerator({
     if (side === "front" && !frontImage) return showMessage("Adicione a arte da frente antes de imprimir.");
     if (side === "back" && !backImage) return showMessage("Adicione a arte do verso antes de imprimir.");
     setCurrentView(side);
-    setIsPrinting(true);
-    window.setTimeout(() => window.print(), 80);
+
+    window.setTimeout(() => {
+      const zoomEl = zoomRef.current;
+      const oldTransform = zoomEl?.style.transform ?? "";
+      if (zoomEl) {
+        zoomEl.style.transform = "none";
+      }
+
+      const restore = () => {
+        if (zoomEl) {
+          zoomEl.style.transform = oldTransform;
+        }
+        window.removeEventListener("afterprint", restore);
+      };
+
+      window.addEventListener("afterprint", restore);
+      window.print();
+    }, 100);
   }
-
-  useEffect(() => {
-    function restoreZoomAfterPrint() {
-      setIsPrinting(false);
-    }
-
-    window.addEventListener("afterprint", restoreZoomAfterPrint);
-    return () => {
-      window.removeEventListener("afterprint", restoreZoomAfterPrint);
-    };
-  }, []);
 
   function handleTemplateSelect(template: TemplateItem) {
     setFrontImage(template.front_url);
@@ -193,9 +198,10 @@ export default function CardGenerator({
         </div>
 
         <div
+          ref={zoomRef}
           className="imprimax-zoom"
           style={{
-            transform: isPrinting ? "none" : `scale(${zoom / 100})`,
+            transform: `scale(${zoom / 100})`,
             transformOrigin: "top center",
           }}
         >

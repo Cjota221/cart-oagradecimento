@@ -71,7 +71,6 @@ body {
 
 @media print {
   @page {
-    size: A4 portrait;
     margin: 0;
   }
 
@@ -115,6 +114,11 @@ body {
     box-shadow: none !important;
     overflow: hidden !important;
     display: block !important;
+  }
+
+  .a4-sheet.landscape {
+    width: 297mm !important;
+    height: 210mm !important;
   }
 
   .card-grid {

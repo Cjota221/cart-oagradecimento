@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 export default function Home() {
   return (
     <div className="flex flex-col flex-1">
-      <header className="border-b border-white/20 bg-[linear-gradient(90deg,#6c2eb9,#e91e8c)] text-white">
+      <header className="no-print border-b border-white/20 bg-[linear-gradient(90deg,#6c2eb9,#e91e8c)] text-white">
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-6">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">Imprimax</h1>
@@ -28,7 +28,7 @@ export default function Home() {
       </header>
 
       <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-6 md:px-6">
-        <section className="mb-6 grid gap-4 rounded-2xl border border-[#6c2eb9]/10 bg-white/90 p-5 md:grid-cols-[1fr_auto] md:items-center">
+        <section className="no-print mb-6 grid gap-4 rounded-2xl border border-[#6c2eb9]/10 bg-white/90 p-5 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <h2 className="text-2xl font-extrabold text-[#1a0533] md:text-3xl">
               Crie, alinhe e imprima frente/verso sem dor de cabeça
