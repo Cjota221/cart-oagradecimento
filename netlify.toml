@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Variáveis obrigatórias (defina no painel do Netlify):
+# NEXT_PUBLIC_APP_URL
+# NEXT_PUBLIC_SUPABASE_URL
+# NEXT_PUBLIC_SUPABASE_ANON_KEY
+# SUPABASE_SERVICE_ROLE_KEY
+# MERCADOPAGO_ACCESS_TOKEN
+# NEXT_PUBLIC_LIFETIME_PRICE_BRL
