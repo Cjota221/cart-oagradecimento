@@ -1,32 +1,59 @@
-# Imprimax
+# Imprimax (Fase 1)
 
-Gerador de cartões para impressão frente/verso em HTML puro, sem build e sem servidor.
+Base do projeto em Next.js 15 com App Router, Tailwind CSS, Supabase e Mercado Pago.
 
-## Estrutura
+## Stack
+
+- Next.js 15
+- React 19
+- Tailwind CSS
+- Supabase (`@supabase/supabase-js` + `@supabase/ssr`)
+- Mercado Pago SDK
+
+## Estrutura principal
 
 ```text
-imprimax/
-  index.html
-  css/
-    styles.css
-  js/
-    app.js
-    grid.js
-    print.js
-  assets/
-    artes/
-  README.md
+src/
+  app/
+    page.tsx
+    login/page.tsx
+    dashboard/page.tsx
+    api/payment/route.ts
+    api/webhook/route.ts
+  components/
+    ui/
+    CardGenerator.tsx
+    TemplateGallery.tsx
+  lib/
+    supabase.ts
+    supabase-server.ts
+    supabase-service.ts
+    mercadopago.ts
+public/
+  templates/
+supabase/
+  schema.sql
 ```
 
-## Como usar
+## Configuração
 
-1. Abra `index.html` diretamente no navegador.
-2. Adicione a arte da frente e, se quiser, a do verso.
-3. Ajuste colunas, linhas, espaçamento e orientação.
-4. Clique em `Imprimir frente` e depois em `Imprimir verso`.
+1. Copie `.env.local.example` para `.env.local`.
+2. Preencha as credenciais do Supabase e Mercado Pago.
+3. Rode:
 
-## Observações
+```bash
+npm install
+npm run dev
+```
 
-- O projeto usa Tailwind CDN e vanilla JS.
-- As artes prontas ficam preparadas em `assets/artes/`.
-- O fluxo de impressão usa restauração automática após o diálogo de impressão, inclusive no mobile.
+## Banco de dados
+
+O SQL completo de criação de tabelas e políticas RLS está em `supabase/schema.sql`.
+
+## Rotas
+
+- `/` landing page com CTA e gerador básico.
+- `/login` autenticação (login/cadastro).
+- `/dashboard` ferramenta principal para usuários com acesso pago.
+- `POST /api/payment` criação de preferência no Mercado Pago.
+- `POST /api/webhook` confirmação de pagamento e liberação de acesso.
