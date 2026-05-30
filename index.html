@@ -87,37 +87,40 @@
                 margin: 0;
             }
             
-            body { margin: 0; padding: 0; background: white; }
+            /* Correção DEFINITIVA para Folha Branca no Mobile */
+            html, body, #main-wrapper, #preview-container, #zoom-wrapper { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                background: white !important; 
+                height: auto !important;
+                width: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                position: static !important;
+            }
 
             .no-print, header, aside, #flip-modal, #print-mode-controls {
                 display: none !important;
             }
 
-            body.printing-front main, body.printing-back main {
-                background-color: white; 
-                padding: 0;
-            }
-
             .a4-page {
-                box-shadow: none;
-                margin: 0;
-                padding: 10mm; /* Mantém a margem de segurança na hora de imprimir */
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 10mm !important; /* Mantém a margem de segurança na hora de imprimir */
                 width: 210mm !important;
                 height: 297mm !important;
                 page-break-after: always;
             }
 
-            /* Se o usuário escolheu paisagem, giramos o layout NA HORA de imprimir 
-               assim a impressora continua puxando o papel normal (retrato), mas o conteúdo sai deitado */
+            /* Se o usuário escolheu paisagem, giramos o layout NA HORA de imprimir */
             .a4-page.landscape {
-                transform: rotate(-90deg) translate(-210mm, 0);
-                transform-origin: top left;
+                transform: rotate(-90deg) translate(-210mm, 0) !important;
+                transform-origin: top left !important;
                 width: 297mm !important;
                 height: 210mm !important;
             }
 
             .card-item-wrapper { border: none !important; padding: 0 !important; }
-            #zoom-wrapper { transform: scale(1) !important; width: 100%; }
         }
 
         /* Estilização da Scrollbar para ficar mais bonita */
@@ -206,7 +209,7 @@
 
     <!-- ÁREA PRINCIPAL DIVIDIDA PARA MOBILE E DESKTOP -->
     <!-- flex-col (celular) | md:flex-row (computador) -->
-    <div class="flex flex-col md:flex-row flex-1 min-h-0">
+    <div id="main-wrapper" class="flex flex-col md:flex-row flex-1 min-h-0">
         
         <!-- VISUALIZAÇÃO DA FOLHA (Topo no Celular, Direita no PC) -->
         <main id="preview-container" class="order-1 md:order-2 h-[45vh] md:h-full flex-1 bg-gray-300 overflow-auto flex items-start justify-center p-4 md:p-8 relative no-print shadow-inner">
@@ -577,10 +580,11 @@
             // Muda a tela para o verso para a pessoa ver o que está imprimindo
             if(state.currentView !== 'back') switchView('back');
             
-            // Pequeno delay para a modal fechar suavemente
-            setTimeout(() => {
-                triggerPrint('back');
-            }, 300);
+            // Força o navegador a recalcular o layout antes de imprimir
+            document.body.offsetHeight;
+            
+            // Chama direto sem timeout para evitar o bloqueio no mobile
+            triggerPrint('back');
         }
 
         function triggerPrint(side) {
@@ -593,19 +597,51 @@
             document.body.classList.remove('printing-front', 'printing-back');
             document.body.classList.add(`printing-${side}`);
             
-            // Mostra o banner de aviso caso a janela seja bloqueada
+            // Mostra o banner de aviso
             document.getElementById('print-mode-controls').classList.remove('hidden');
             
-            // Timeout para garantir que o CSS aplicou antes de chamar o print do sistema
-            setTimeout(() => {
-                window.print();
-            }, 500);
+            // --- CÓDIGO ANTIBUG DA TELA BRANCA NO CELULAR ---
+            // Removemos fisicamente as classes que travam o tamanho da tela e causam bug no iOS/Android
+            document.body.classList.remove('h-screen', 'overflow-hidden');
+            
+            const previewContainer = document.getElementById('preview-container');
+            previewContainer.classList.remove('h-[45vh]', 'md:h-full', 'overflow-auto');
+            
+            const mainWrapper = document.getElementById('main-wrapper');
+            if(mainWrapper) mainWrapper.classList.remove('min-h-0');
+
+            // Remove o zoom aplicado pelo JS temporariamente
+            const zoomWrapper = document.getElementById('zoom-wrapper');
+            zoomWrapper.dataset.oldTransform = zoomWrapper.style.transform;
+            zoomWrapper.style.transform = 'none';
+            // ------------------------------------------------
+
+            // Força o DOM a ser atualizado instantaneamente
+            document.body.offsetHeight;
+            
+            // Chama a janela de impressão diretamente!
+            window.print();
         }
 
         function exitPrintMode() {
             // Remove as classes de impressão para voltar a edição
             document.body.classList.remove('printing-front', 'printing-back');
             document.getElementById('print-mode-controls').classList.add('hidden');
+            
+            // --- RESTAURA AS CLASSES DA TELA ---
+            document.body.classList.add('h-screen', 'overflow-hidden');
+            
+            const previewContainer = document.getElementById('preview-container');
+            previewContainer.classList.add('h-[45vh]', 'md:h-full', 'overflow-auto');
+            
+            const mainWrapper = document.getElementById('main-wrapper');
+            if(mainWrapper) mainWrapper.classList.add('min-h-0');
+
+            const zoomWrapper = document.getElementById('zoom-wrapper');
+            if(zoomWrapper.dataset.oldTransform) {
+                zoomWrapper.style.transform = zoomWrapper.dataset.oldTransform;
+            }
+            // -----------------------------------
         }
 
         // Inicialização
