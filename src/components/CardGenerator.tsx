@@ -146,15 +146,15 @@ export default function CardGenerator({
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-      <Card className="relative overflow-auto p-4">
+    <div className="imprimax-generator grid gap-4 lg:grid-cols-[1fr_360px]">
+      <Card className="imprimax-preview-card relative overflow-auto p-4">
         {statusMessage && (
-          <div className="mb-3 rounded-xl bg-[#1a0533] px-3 py-2 text-xs font-medium text-white">
+          <div className="no-print mb-3 rounded-xl bg-[#1a0533] px-3 py-2 text-xs font-medium text-white">
             {statusMessage}
           </div>
         )}
 
-        <div className="mb-3 flex items-center gap-2">
+        <div className="no-print mb-3 flex items-center gap-2">
           <button
             onClick={() => setCurrentView("front")}
             className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#6c2eb9]/15 text-[#6c2eb9]" : "text-[#1a0533]/60"}`}
@@ -179,7 +179,7 @@ export default function CardGenerator({
           </div>
         </div>
 
-        <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}>
+        <div className="imprimax-zoom" style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}>
           <div className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}>
             <div
               className="card-grid"
@@ -195,7 +195,7 @@ export default function CardGenerator({
         </div>
       </Card>
 
-      <div className="space-y-4">
+      <div className="no-print space-y-4">
         <Card>
           <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#1a0533]/70">Suas artes</h3>
           <div className="space-y-3">

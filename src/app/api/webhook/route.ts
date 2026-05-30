@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseServiceClient();
 
-    await supabase.from("payments").upsert(
+    await supabase.from("imprimax_payments").upsert(
       {
         user_id: userId || null,
         mp_payment_id: paymentId,
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     if (paymentStatus === "approved" && userId) {
       await supabase
-        .from("profiles")
+        .from("imprimax_profiles")
         .update({ has_access: true, paid_at: new Date().toISOString() })
         .eq("id", userId);
     }

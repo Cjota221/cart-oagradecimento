@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     });
 
     const supabase = getSupabaseServiceClient();
-    await supabase.from("payments").insert({
+    await supabase.from("imprimax_payments").insert({
       user_id: userId,
       mp_preference_id: result.id,
       status: "pending",

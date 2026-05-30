@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   }
 
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("imprimax_profiles")
     .select("has_access")
     .eq("id", user.id)
     .maybeSingle();
@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   }
 
   const { data: templatesRaw } = await supabase
-    .from("templates")
+    .from("imprimax_templates")
     .select("id,name,category,front_url,back_url,is_free")
     .eq("is_active", true)
     .order("created_at", { ascending: false });

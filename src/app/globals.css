@@ -14,7 +14,7 @@
   --color-imprimax-background: var(--imprimax-background);
   --color-imprimax-text: var(--imprimax-text);
   --color-imprimax-accent: var(--imprimax-accent);
-  --font-sans: var(--font-poppins);
+  --font-sans: var(--font-inter);
 }
 
 body {
@@ -23,7 +23,7 @@ body {
     radial-gradient(circle at bottom right, rgba(108, 46, 185, 0.12), transparent 35%),
     var(--imprimax-background);
   color: var(--imprimax-text);
-  font-family: var(--font-poppins), sans-serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 .imprimax-btn {
@@ -74,7 +74,43 @@ body {
     margin: 0;
   }
 
+  .no-print {
+    display: none !important;
+  }
+
+  .imprimax-generator {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .imprimax-preview-card {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .imprimax-zoom {
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .a4-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+
+  .card-tile-guides .card-tile {
+    border: 0 !important;
+  }
+
   body {
+    margin: 0 !important;
+    padding: 0 !important;
     background: white !important;
   }
 }

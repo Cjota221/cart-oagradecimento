@@ -29,7 +29,7 @@ export default function LoginPage() {
         if (error) throw error;
 
         if (data.user) {
-          await supabase.from("profiles").upsert({
+          await supabase.from("imprimax_profiles").upsert({
             id: data.user.id,
             email,
             name,
