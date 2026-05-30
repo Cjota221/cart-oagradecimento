@@ -33,6 +33,7 @@ export default function CardGenerator({
   const [currentView, setCurrentView] = useState<View>("front");
   const [showGuides, setShowGuides] = useState(true);
   const [zoom, setZoom] = useState(48);
+  const [isPrinting, setIsPrinting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loadingSide, setLoadingSide] = useState<Side | null>(null);
 
@@ -136,8 +137,20 @@ export default function CardGenerator({
     if (side === "front" && !frontImage) return showMessage("Adicione a arte da frente antes de imprimir.");
     if (side === "back" && !backImage) return showMessage("Adicione a arte do verso antes de imprimir.");
     setCurrentView(side);
+    setIsPrinting(true);
     window.setTimeout(() => window.print(), 80);
   }
+
+  useEffect(() => {
+    function restoreZoomAfterPrint() {
+      setIsPrinting(false);
+    }
+
+    window.addEventListener("afterprint", restoreZoomAfterPrint);
+    return () => {
+      window.removeEventListener("afterprint", restoreZoomAfterPrint);
+    };
+  }, []);
 
   function handleTemplateSelect(template: TemplateItem) {
     setFrontImage(template.front_url);
@@ -179,7 +192,13 @@ export default function CardGenerator({
           </div>
         </div>
 
-        <div className="imprimax-zoom" style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}>
+        <div
+          className="imprimax-zoom"
+          style={{
+            transform: isPrinting ? "none" : `scale(${zoom / 100})`,
+            transformOrigin: "top center",
+          }}
+        >
           <div className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}>
             <div
               className="card-grid"
