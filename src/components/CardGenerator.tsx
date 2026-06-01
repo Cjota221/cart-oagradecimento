@@ -7,6 +7,24 @@ import TemplateGallery, { TemplateItem } from "@/components/TemplateGallery";
 
 const PAGE_PADDING_MM = 20;
 
+// Dimensoes do papel em mm (largura x altura no modo retrato).
+const PAPER_DIMENSIONS_MM = {
+  A4: { w: 210, h: 297 },
+  A5: { w: 148, h: 210 },
+  Carta: { w: 216, h: 279 },
+} as const;
+
+// Area util em cm (descontando 5mm de margem em cada lado = 10mm total).
+const PAPER_USABLE_CM = {
+  A4: { w: 20.0, h: 28.7 },
+  A5: { w: 13.8, h: 20.0 },
+  Carta: { w: 20.6, h: 26.9 },
+} as const;
+
+const GAP_PADRAO_CM = 0.2;
+const ARTE_MIN_CM = 1;
+const ARTE_MAX_CM = 30;
+
 type Props = {
   enableTemplates?: boolean;
   templates?: TemplateItem[];
@@ -16,6 +34,22 @@ type Props = {
 type Side = "front" | "back";
 type View = "front" | "back";
 type Orientation = "portrait" | "landscape";
+type PaperFormat = keyof typeof PAPER_DIMENSIONS_MM;
+
+type CalcResultado =
+  | { ok: true; colunas: number; linhas: number; total: number; mensagem: string }
+  | { ok: false; mensagem: string };
+
+function calcularGridPorCm(
+  larguraCm: number,
+  alturaCm: number,
+  papel: PaperFormat,
+): { colunas: number; linhas: number; total: number } {
+  const pagina = PAPER_USABLE_CM[papel];
+  const colunas = Math.floor((pagina.w + GAP_PADRAO_CM) / (larguraCm + GAP_PADRAO_CM));
+  const linhas = Math.floor((pagina.h + GAP_PADRAO_CM) / (alturaCm + GAP_PADRAO_CM));
+  return { colunas, linhas, total: colunas * linhas };
+}
 
 export default function CardGenerator({
   enableTemplates = false,
@@ -35,6 +69,13 @@ export default function CardGenerator({
   const [zoom, setZoom] = useState(48);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loadingSide, setLoadingSide] = useState<Side | null>(null);
+
+  // Calculo de grid por dimensoes em cm
+  const [paperFormat, setPaperFormat] = useState<PaperFormat>("A4");
+  const [arteWidthCm, setArteWidthCm] = useState<string>("");
+  const [arteHeightCm, setArteHeightCm] = useState<string>("");
+  const [calcResultado, setCalcResultado] = useState<CalcResultado | null>(null);
+
   const zoomRef = useRef<HTMLDivElement | null>(null);
 
   const safeRows = Math.min(10, Math.max(1, rows));
@@ -47,11 +88,16 @@ export default function CardGenerator({
     setGap(safeGap);
   }, [safeRows, safeCols, safeGap]);
 
+  const paperDims = useMemo(() => {
+    const base = PAPER_DIMENSIONS_MM[paperFormat];
+    return orientation === "landscape"
+      ? { w: base.h, h: base.w }
+      : { w: base.w, h: base.h };
+  }, [paperFormat, orientation]);
+
   const cardSize = useMemo(() => {
-    const pageWidth = orientation === "landscape" ? 297 : 210;
-    const pageHeight = orientation === "landscape" ? 210 : 297;
-    const availableWidth = pageWidth - PAGE_PADDING_MM;
-    const availableHeight = pageHeight - PAGE_PADDING_MM;
+    const availableWidth = paperDims.w - PAGE_PADDING_MM;
+    const availableHeight = paperDims.h - PAGE_PADDING_MM;
     const cardWidthMm = Math.max(0, (availableWidth - (safeCols - 1) * safeGap) / safeCols);
     const cardHeightMm = Math.max(0, (availableHeight - (safeRows - 1) * safeGap) / safeRows);
 
@@ -59,7 +105,70 @@ export default function CardGenerator({
       mm: `${cardWidthMm.toFixed(1)} mm x ${cardHeightMm.toFixed(1)} mm`,
       px: `(${Math.round(cardWidthMm * (300 / 25.4))} px x ${Math.round(cardHeightMm * (300 / 25.4))} px a 300 DPI)`,
     };
-  }, [orientation, safeCols, safeRows, safeGap]);
+  }, [paperDims, safeCols, safeRows, safeGap]);
+
+  // Limpa o resultado quando o usuario muda formato (a calc deixa de valer)
+  useEffect(() => {
+    setCalcResultado(null);
+  }, [paperFormat]);
+
+  function handleCalcularGrid() {
+    const larguraCm = parseFloat(arteWidthCm.replace(",", "."));
+    const alturaCm = parseFloat(arteHeightCm.replace(",", "."));
+
+    if (!Number.isFinite(larguraCm) || !Number.isFinite(alturaCm)) {
+      setCalcResultado({
+        ok: false,
+        mensagem: "Informe largura e altura em cm.",
+      });
+      return;
+    }
+    if (
+      larguraCm < ARTE_MIN_CM ||
+      alturaCm < ARTE_MIN_CM ||
+      larguraCm > ARTE_MAX_CM ||
+      alturaCm > ARTE_MAX_CM
+    ) {
+      setCalcResultado({
+        ok: false,
+        mensagem: `Use dimensoes entre ${ARTE_MIN_CM} e ${ARTE_MAX_CM} cm.`,
+      });
+      return;
+    }
+
+    const pagina = PAPER_USABLE_CM[paperFormat];
+    if (larguraCm > pagina.w || alturaCm > pagina.h) {
+      setCalcResultado({
+        ok: false,
+        mensagem: "Arte maior que o papel selecionado. Revise as dimensoes.",
+      });
+      return;
+    }
+
+    const { colunas, linhas, total } = calcularGridPorCm(
+      larguraCm,
+      alturaCm,
+      paperFormat,
+    );
+
+    if (colunas === 0 || linhas === 0) {
+      setCalcResultado({
+        ok: false,
+        mensagem: "Arte maior que o papel selecionado. Revise as dimensoes.",
+      });
+      return;
+    }
+
+    setCols(colunas);
+    setRows(linhas);
+    setCalcResultado({
+      ok: true,
+      colunas,
+      linhas,
+      total,
+      mensagem: `${colunas} colunas x ${linhas} linhas = ${total} cartoes por folha (${paperFormat}, artes de ${larguraCm}x${alturaCm} cm)`,
+    });
+  }
 
   function showMessage(message: string) {
     setStatusMessage(message);
@@ -205,7 +314,13 @@ export default function CardGenerator({
             transformOrigin: "top center",
           }}
         >
-          <div className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}>
+          <div
+            className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}
+            style={{
+              width: `${paperDims.w}mm`,
+              height: `${paperDims.h}mm`,
+            }}
+          >
             <div
               className="card-grid"
               style={{
@@ -234,6 +349,69 @@ export default function CardGenerator({
             </label>
           </div>
           {loadingSide && <p className="mt-2 text-xs text-[#e91e8c]">Carregando arte {loadingSide}...</p>}
+        </Card>
+
+        <Card>
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#1a0533]/70">
+            📐 Tamanho da arte
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="text-xs">
+              Largura (cm)
+              <Input
+                type="number"
+                step="0.1"
+                min={ARTE_MIN_CM}
+                max={ARTE_MAX_CM}
+                placeholder="ex: 6"
+                value={arteWidthCm}
+                onChange={(e) => setArteWidthCm(e.target.value)}
+              />
+            </label>
+            <label className="text-xs">
+              Altura (cm)
+              <Input
+                type="number"
+                step="0.1"
+                min={ARTE_MIN_CM}
+                max={ARTE_MAX_CM}
+                placeholder="ex: 7"
+                value={arteHeightCm}
+                onChange={(e) => setArteHeightCm(e.target.value)}
+              />
+            </label>
+          </div>
+          <label className="mt-3 block text-xs">
+            Formato do papel
+            <select
+              className="mt-1 w-full rounded-xl border border-[#6c2eb9]/20 bg-white px-3 py-2 text-sm"
+              value={paperFormat}
+              onChange={(e) => setPaperFormat(e.target.value as PaperFormat)}
+            >
+              <option value="A4">A4 (21 x 29,7 cm)</option>
+              <option value="A5">A5 (14,8 x 21 cm)</option>
+              <option value="Carta">Carta (21,6 x 27,9 cm)</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            onClick={handleCalcularGrid}
+            className="imprimax-btn mt-3 w-full justify-center"
+          >
+            ✨ Calcular grid automaticamente
+          </button>
+          {calcResultado && (
+            <div
+              className={`mt-3 rounded-xl px-3 py-2 text-xs font-medium ${
+                calcResultado.ok
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-red-50 text-red-700"
+              }`}
+            >
+              {calcResultado.ok ? "✅ " : "❌ "}
+              {calcResultado.mensagem}
+            </div>
+          )}
         </Card>
 
         <Card>
