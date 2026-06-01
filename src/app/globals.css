@@ -14,7 +14,7 @@
   --color-imprimax-background: var(--imprimax-background);
   --color-imprimax-text: var(--imprimax-text);
   --color-imprimax-accent: var(--imprimax-accent);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-poppins);
 }
 
 body {
@@ -23,7 +23,7 @@ body {
     radial-gradient(circle at bottom right, rgba(108, 46, 185, 0.12), transparent 35%),
     var(--imprimax-background);
   color: var(--imprimax-text);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-poppins), sans-serif;
 }
 
 .imprimax-btn {

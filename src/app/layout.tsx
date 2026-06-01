@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Imprimax",
-  description: "Gerador de Cartões Profissional",
+  title: "Imprimax — Imprima seus cartões em casa, sem designer",
+  description:
+    "Faça upload da sua arte, defina o tamanho em cm e imprima frente/verso direto da sua impressora. R$19,90 vitalício.",
 };
 
 export default function RootLayout({
@@ -19,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
