@@ -38,8 +38,8 @@ export default function AppPage() {
             </p>
           </div>
           <div className="w-full max-w-xs">
-            <Link href="/#comprar">
-              <Button className="w-full">Comprar Acesso Vitalício</Button>
+            <Link href="/checkout">
+              <Button className="w-full">Comprar Acesso Vitalício →</Button>
             </Link>
           </div>
         </section>
