@@ -318,12 +318,22 @@ export default function CardGenerator({
     if (side === "front" && !frontImage) return showMessage("Adicione a arte da frente antes de imprimir.");
     if (side === "back" && !backImage) return showMessage("Adicione a arte do verso antes de imprimir.");
     setCurrentView(side);
+
+    // Injeta o tamanho correto da página para o browser respeitar
+    const pageStyle = document.createElement("style");
+    pageStyle.id = "imprimax-print-page";
+    const size = orientation === "landscape" ? "297mm 210mm" : "210mm 297mm";
+    pageStyle.textContent = `@page { size: ${size}; margin: 0; }`;
+    document.head.appendChild(pageStyle);
+
     window.setTimeout(() => {
       const zoomEl = zoomRef.current;
       const oldTransform = zoomEl?.style.transform ?? "";
       if (zoomEl) zoomEl.style.transform = "none";
       const restore = () => {
         if (zoomEl) zoomEl.style.transform = oldTransform;
+        const injected = document.getElementById("imprimax-print-page");
+        if (injected) document.head.removeChild(injected);
         window.removeEventListener("afterprint", restore);
       };
       window.addEventListener("afterprint", restore);

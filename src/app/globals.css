@@ -414,7 +414,20 @@ body {
 @media print {
   @page { margin: 0; }
   html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+
+  /* Esconde tudo e mostra só a folha A4 */
+  body { visibility: hidden; }
+  .a4-sheet {
+    visibility: visible !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+  }
+  .a4-sheet * { visibility: visible !important; }
+
   .no-print { display: none !important; }
-  .a4-sheet { position: absolute !important; top: 0 !important; left: 0 !important; margin: 0 !important; box-shadow: none !important; }
   .card-tile-guides .card-tile { border: 0 !important; }
 }
