@@ -8,8 +8,9 @@
 
 begin;
 
-alter table public.imprimax_profiles
-  add column if not exists is_admin boolean default false;
+alter table public.imprimax_profiles add column if not exists email text;
+alter table public.imprimax_profiles add column if not exists has_access boolean default false;
+alter table public.imprimax_profiles add column if not exists is_admin boolean default false;
 
 with admin_emails(email) as (
   values
@@ -18,15 +19,22 @@ with admin_emails(email) as (
 )
 insert into public.imprimax_profiles (
   id,
+  tenant_id,
+  full_name,
   email,
-  name,
   has_access,
   is_admin
 )
 select
   users.id,
+  (
+    select profiles.tenant_id
+    from public.imprimax_profiles as profiles
+    where profiles.tenant_id is not null
+    limit 1
+  ),
+  coalesce(users.raw_user_meta_data->>'full_name', users.raw_user_meta_data->>'name', 'Admin Imprimax'),
   users.email,
-  coalesce(users.raw_user_meta_data->>'name', 'Admin Imprimax'),
   true,
   true
 from auth.users
@@ -35,8 +43,8 @@ inner join admin_emails
   on lower(users.email) = lower(admin_emails.email)
 on conflict (id) do update
 set
+  full_name = coalesce(public.imprimax_profiles.full_name, excluded.full_name),
   email = excluded.email,
-  name = coalesce(public.imprimax_profiles.name, excluded.name),
   has_access = true,
   is_admin = true;
 
