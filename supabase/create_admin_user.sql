@@ -3,7 +3,7 @@
 -- Importante:
 -- 1. Crie o usuario no Supabase Auth com o e-mail e a senha desejados
 --    em Authentication > Users, ou use a API Admin createUser.
--- 2. Depois execute este SQL trocando <ADMIN_EMAIL> pelo e-mail do admin.
+-- 2. Depois execute este SQL trocando os e-mails abaixo pelos admins.
 -- 3. Nao salve senha real neste arquivo.
 
 begin;
@@ -11,6 +11,11 @@ begin;
 alter table public.imprimax_profiles
   add column if not exists is_admin boolean default false;
 
+with admin_emails(email) as (
+  values
+    ('<ADMIN_EMAIL>'),
+    ('<SECOND_ADMIN_EMAIL>')
+)
 insert into public.imprimax_profiles (
   id,
   email,
@@ -26,7 +31,8 @@ select
   true
 from auth.users
   as users
-where lower(users.email) = lower('<ADMIN_EMAIL>')
+inner join admin_emails
+  on lower(users.email) = lower(admin_emails.email)
 on conflict (id) do update
 set
   email = excluded.email,
@@ -35,13 +41,24 @@ set
   is_admin = true;
 
 do $$
+declare
+  missing_email text;
 begin
-  if not exists (
-    select 1
-    from auth.users
-    where lower(email) = lower('<ADMIN_EMAIL>')
-  ) then
-    raise exception 'Usuario admin nao existe no Supabase Auth: %', '<ADMIN_EMAIL>';
+  with admin_emails(email) as (
+    values
+      ('<ADMIN_EMAIL>'),
+      ('<SECOND_ADMIN_EMAIL>')
+  )
+  select admin_emails.email
+    into missing_email
+  from admin_emails
+  left join auth.users
+    on lower(auth.users.email) = lower(admin_emails.email)
+  where auth.users.id is null
+  limit 1;
+
+  if missing_email is not null then
+    raise exception 'Usuario admin nao existe no Supabase Auth: %', missing_email;
   end if;
 end $$;
 
