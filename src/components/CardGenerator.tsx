@@ -59,42 +59,13 @@ function calcularGridPorProporcao(
   orientation: Orientation,
   gapMm: number,
 ): { colunas: number; linhas: number; total: number } {
-  const base = PAPER_DIMENSIONS_MM[papel];
-  const page =
-    orientation === "landscape"
-      ? { w: base.h - PAGE_PADDING_MM, h: base.w - PAGE_PADDING_MM }
-      : { w: base.w - PAGE_PADDING_MM, h: base.h - PAGE_PADDING_MM };
-  const imageRatio = imageWidth / imageHeight;
+  void imageWidth;
+  void imageHeight;
+  void papel;
+  void orientation;
+  void gapMm;
 
-  let best = {
-    colunas: 1,
-    linhas: 1,
-    total: 1,
-    score: Number.POSITIVE_INFINITY,
-  };
-
-  for (let colunas = 1; colunas <= 10; colunas += 1) {
-    for (let linhas = 1; linhas <= 10; linhas += 1) {
-      const cellWidth = (page.w - (colunas - 1) * gapMm) / colunas;
-      const cellHeight = (page.h - (linhas - 1) * gapMm) / linhas;
-      if (cellWidth <= 0 || cellHeight <= 0) continue;
-
-      const cellRatio = cellWidth / cellHeight;
-      const ratioPenalty = Math.abs(Math.log(cellRatio / imageRatio));
-      const count = colunas * linhas;
-      const score = ratioPenalty * 18 - count;
-
-      if (score < best.score) {
-        best = { colunas, linhas, total: count, score };
-      }
-    }
-  }
-
-  return {
-    colunas: best.colunas,
-    linhas: best.linhas,
-    total: best.total,
-  };
+  return { colunas: 3, linhas: 3, total: 9 };
 }
 
 export default function CardGenerator({
@@ -240,7 +211,7 @@ export default function CardGenerator({
       colunas,
       linhas,
       total,
-      mensagem: `Grade ajustada automaticamente pela proporcao da arte (${image.naturalWidth}x${image.naturalHeight}px): ${colunas} colunas x ${linhas} linhas.`,
+      mensagem: `Grade padrao aplicada ao template (${image.naturalWidth}x${image.naturalHeight}px): ${colunas} colunas x ${linhas} linhas.`,
     });
   }
 
