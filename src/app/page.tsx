@@ -163,8 +163,8 @@ export default function Home() {
             <a href="#duvidas" className="hover:text-[#FF5028]">Duvidas</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/app" className="hidden rounded-lg px-4 py-2 text-sm font-bold text-[#16120E]/70 hover:text-[#FF5028] sm:block">
-              Testar gratis
+            <Link href="/login" className="hidden rounded-lg px-4 py-2 text-sm font-bold text-[#16120E]/70 hover:text-[#FF5028] sm:block">
+              Entrar
             </Link>
             <CtaButton className="hidden px-4 py-2.5 sm:inline-flex" />
           </div>
@@ -194,12 +194,6 @@ export default function Home() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <CtaButton className="w-full text-base sm:w-auto sm:px-8 sm:py-4" />
-                <Link
-                  href="/app"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#16120E]/15 bg-white px-6 py-3.5 text-sm font-bold text-[#16120E] transition hover:border-[#FF5028]/40 hover:text-[#FF5028]"
-                >
-                  Testar o gerador
-                </Link>
               </div>
 
               <div className="mt-6 flex flex-wrap gap-2">
