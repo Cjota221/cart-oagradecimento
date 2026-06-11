@@ -125,6 +125,14 @@ body {
 .card-grid { display: grid; width: 100%; height: 100%; }
 .card-tile { position: relative; overflow: hidden; display: flex; align-items: stretch; justify-content: stretch; }
 .card-tile img { width: 100%; height: 100%; object-fit: cover; }
+.card-tile img,
+.imprimax-generator img {
+  color-adjust: exact;
+  image-rendering: auto;
+  print-color-adjust: exact;
+  transform: translateZ(0);
+  -webkit-print-color-adjust: exact;
+}
 .card-tile-guides .card-tile { border: 1px dashed rgba(255, 80, 40, 0.2); }
 
 .sales-grid-bg {

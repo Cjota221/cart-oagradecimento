@@ -52,6 +52,51 @@ function calcularGridPorCm(
   return { colunas, linhas, total: colunas * linhas };
 }
 
+function calcularGridPorProporcao(
+  imageWidth: number,
+  imageHeight: number,
+  papel: PaperFormat,
+  orientation: Orientation,
+  gapMm: number,
+): { colunas: number; linhas: number; total: number } {
+  const base = PAPER_DIMENSIONS_MM[papel];
+  const page =
+    orientation === "landscape"
+      ? { w: base.h - PAGE_PADDING_MM, h: base.w - PAGE_PADDING_MM }
+      : { w: base.w - PAGE_PADDING_MM, h: base.h - PAGE_PADDING_MM };
+  const imageRatio = imageWidth / imageHeight;
+
+  let best = {
+    colunas: 1,
+    linhas: 1,
+    total: 1,
+    score: Number.POSITIVE_INFINITY,
+  };
+
+  for (let colunas = 1; colunas <= 10; colunas += 1) {
+    for (let linhas = 1; linhas <= 10; linhas += 1) {
+      const cellWidth = (page.w - (colunas - 1) * gapMm) / colunas;
+      const cellHeight = (page.h - (linhas - 1) * gapMm) / linhas;
+      if (cellWidth <= 0 || cellHeight <= 0) continue;
+
+      const cellRatio = cellWidth / cellHeight;
+      const ratioPenalty = Math.abs(Math.log(cellRatio / imageRatio));
+      const count = colunas * linhas;
+      const score = ratioPenalty * 18 - count;
+
+      if (score < best.score) {
+        best = { colunas, linhas, total: count, score };
+      }
+    }
+  }
+
+  return {
+    colunas: best.colunas,
+    linhas: best.linhas,
+    total: best.total,
+  };
+}
+
 export default function CardGenerator({
   enableTemplates = false,
   templates = [],
@@ -67,9 +112,10 @@ export default function CardGenerator({
   const [orientation, setOrientation] = useState<Orientation>("portrait");
   const [currentView, setCurrentView] = useState<View>("front");
   const [showGuides, setShowGuides] = useState(true);
-  const [zoom, setZoom] = useState(48);
+  const [zoom, setZoom] = useState(76);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loadingSide, setLoadingSide] = useState<Side | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   // Calculo de grid por dimensoes em cm
   const [paperFormat, setPaperFormat] = useState<PaperFormat>("A4");
@@ -107,6 +153,8 @@ export default function CardGenerator({
       px: `(${Math.round(cardWidthMm * (300 / 25.4))} px x ${Math.round(cardHeightMm * (300 / 25.4))} px a 300 DPI)`,
     };
   }, [paperDims, safeCols, safeRows, safeGap]);
+
+  const hasArtwork = Boolean(frontImage || backImage);
 
   // Limpa o resultado quando o usuario muda formato (a calc deixa de valer)
   useEffect(() => {
@@ -176,9 +224,43 @@ export default function CardGenerator({
     window.setTimeout(() => setStatusMessage(null), 2600);
   }
 
+  function applyAutoGridFromImage(image: HTMLImageElement) {
+    const { colunas, linhas, total } = calcularGridPorProporcao(
+      image.naturalWidth,
+      image.naturalHeight,
+      paperFormat,
+      orientation,
+      safeGap,
+    );
+
+    setCols(colunas);
+    setRows(linhas);
+    setCalcResultado({
+      ok: true,
+      colunas,
+      linhas,
+      total,
+      mensagem: `Grade ajustada automaticamente pela proporcao da arte (${image.naturalWidth}x${image.naturalHeight}px): ${colunas} colunas x ${linhas} linhas.`,
+    });
+  }
+
+  function loadImageForAutoGrid(src: string, onReady?: () => void) {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      applyAutoGridFromImage(image);
+      onReady?.();
+    };
+    image.onerror = () => {
+      onReady?.();
+    };
+    image.src = src;
+  }
+
   function onImageUpload(event: ChangeEvent<HTMLInputElement>, side: Side) {
     const file = event.target.files?.[0];
     if (!file) return;
+    setSelectedTemplateId(null);
     if (!file.type.startsWith("image/")) {
       showMessage("Formato inválido. Selecione uma imagem.");
       event.target.value = "";
@@ -201,6 +283,7 @@ export default function CardGenerator({
       image.onload = () => {
         if (side === "front") setFrontImage(data);
         if (side === "back") setBackImage(data);
+        if (side === "front") applyAutoGridFromImage(image);
         setLoadingSide(null);
         showMessage(`Arte ${side === "front" ? "da frente" : "do verso"} carregada.`);
       };
@@ -270,70 +353,134 @@ export default function CardGenerator({
   function handleTemplateSelect(template: TemplateItem) {
     setFrontImage(template.front_url);
     setBackImage(template.back_url || null);
-    showMessage(`Template "${template.name}" carregado.`);
+    setSelectedTemplateId(template.id);
+    loadImageForAutoGrid(template.front_url, () => {
+      showMessage(`Template "${template.name}" carregado com grade automatica.`);
+    });
   }
 
   return (
-    <div className="imprimax-generator grid gap-4 lg:grid-cols-[1fr_360px]">
-      <Card className="imprimax-preview-card relative overflow-auto p-4">
+    <div
+      className={`imprimax-generator grid gap-4 ${
+        enableTemplates
+          ? "xl:grid-cols-[390px_minmax(0,1fr)_340px]"
+          : "lg:grid-cols-[minmax(0,1fr)_360px]"
+      }`}
+    >
+      {enableTemplates && (
+        <aside className="no-print xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-auto">
+          <Card className="p-4">
+            <TemplateGallery
+              templates={templates}
+              hasAccess={hasAccess}
+              selectedTemplateId={selectedTemplateId}
+              onSelect={handleTemplateSelect}
+            />
+          </Card>
+        </aside>
+      )}
+
+      <Card className="imprimax-preview-card relative min-h-[540px] overflow-auto p-4">
         {statusMessage && (
           <div className="no-print mb-3 rounded-xl bg-[#16120E] px-3 py-2 text-xs font-medium text-white">
             {statusMessage}
           </div>
         )}
 
-        <div className="no-print mb-3 flex items-center gap-2">
-          <button
-            onClick={() => setCurrentView("front")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#FF5028]/15 text-[#FF5028]" : "text-[#16120E]/60"}`}
-          >
-            Ver frente
-          </button>
-          <button
-            onClick={() => setCurrentView("back")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "back" ? "bg-[#FF5028]/15 text-[#FF5028]" : "text-[#16120E]/60"}`}
-          >
-            Ver verso
-          </button>
-          <div className="ml-auto flex items-center gap-2">
-            <input
-              type="range"
-              min={20}
-              max={150}
-              value={zoom}
-              onChange={(e) => setZoom(Number(e.target.value))}
-            />
-            <span className="w-10 text-right text-xs font-semibold">{zoom}%</span>
-          </div>
-        </div>
+        {hasArtwork ? (
+          <>
+            <div className="no-print mb-3 flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setCurrentView("front")}
+                className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#FF5028]/15 text-[#FF5028]" : "text-[#16120E]/60"}`}
+              >
+                Ver frente
+              </button>
+              <button
+                onClick={() => setCurrentView("back")}
+                className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "back" ? "bg-[#FF5028]/15 text-[#FF5028]" : "text-[#16120E]/60"}`}
+              >
+                Ver verso
+              </button>
+              <div className="ml-auto flex items-center gap-2">
+                <input
+                  type="range"
+                  min={55}
+                  max={150}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                />
+                <span className="w-10 text-right text-xs font-semibold">{zoom}%</span>
+              </div>
+            </div>
 
-        <div
-          ref={zoomRef}
-          className="imprimax-zoom"
-          style={{
-            transform: `scale(${zoom / 100})`,
-            transformOrigin: "top center",
-          }}
-        >
-          <div
-            className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}
-            style={{
-              width: `${paperDims.w}mm`,
-              height: `${paperDims.h}mm`,
-            }}
-          >
             <div
-              className="card-grid"
+              ref={zoomRef}
+              className="imprimax-zoom"
               style={{
-                gridTemplateColumns: `repeat(${safeCols}, minmax(0, 1fr))`,
-                gridTemplateRows: `repeat(${safeRows}, minmax(0, 1fr))`,
-                gap: `${safeGap}mm`,
+                transform: `scale(${zoom / 100})`,
+                transformOrigin: "top center",
               }}
             >
-              {currentView === "front" ? renderGrid("front") : renderGrid("back")}
+              <div
+                className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}
+                style={{
+                  width: `${paperDims.w}mm`,
+                  height: `${paperDims.h}mm`,
+                }}
+              >
+                <div
+                  className="card-grid"
+                  style={{
+                    gridTemplateColumns: `repeat(${safeCols}, minmax(0, 1fr))`,
+                    gridTemplateRows: `repeat(${safeRows}, minmax(0, 1fr))`,
+                    gap: `${safeGap}mm`,
+                  }}
+                >
+                  {currentView === "front" ? renderGrid("front") : renderGrid("back")}
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex min-h-[500px] flex-col justify-center rounded-lg border border-dashed border-[#FFD2C7] bg-[#FFF8F5] p-6">
+            <div className="mx-auto w-full max-w-xl text-center">
+              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-lg bg-white text-[#FF5028] shadow-sm">
+                <Icon name="grid" className="size-6" />
+              </div>
+              <h2 className="text-xl font-extrabold text-[#16120E]">
+                Escolha um template para montar a folha
+              </h2>
+              <p className="mt-2 text-sm text-[#16120E]/65">
+                Os templates ficam em destaque no painel ao lado. Ao carregar um modelo, a folha de impressao aparece aqui com frente, verso e ajustes.
+              </p>
+              {templates.length > 0 && (
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  {templates.slice(0, 3).map((template) => (
+                    <button
+                      key={template.id}
+                      type="button"
+                      onClick={() => handleTemplateSelect(template)}
+                      className="overflow-hidden rounded-lg border border-[#E6E2DC] bg-white text-left shadow-sm transition hover:border-[#FF5028]"
+                    >
+                      <div className="aspect-[4/5] bg-[#F7F7F7]">
+                        <img
+                          src={template.front_url}
+                          alt={template.name}
+                          className="h-full w-full object-contain p-3"
+                          loading="lazy"
+                        />
+                      </div>
+                      <p className="truncate px-3 py-2.5 text-xs font-bold text-[#16120E]">
+                        {template.name}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </Card>
 
       <div className="no-print space-y-4">
@@ -480,9 +627,6 @@ export default function CardGenerator({
           </div>
         </Card>
 
-        {enableTemplates && (
-          <TemplateGallery templates={templates} hasAccess={hasAccess} onSelect={handleTemplateSelect} />
-        )}
       </div>
     </div>
   );
