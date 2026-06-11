@@ -20,7 +20,7 @@ type Props = {
 export default function TemplateGallery({ templates, hasAccess, onSelect }: Props) {
   return (
     <section>
-      <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#1a0533]/70">
+      <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">
         Templates prontos
       </h2>
       <div className="space-y-3">
@@ -35,9 +35,9 @@ export default function TemplateGallery({ templates, hasAccess, onSelect }: Prop
                 onClick={() => onSelect(template)}
                 className="w-full text-left disabled:cursor-not-allowed disabled:opacity-55"
               >
-                <p className="text-sm font-semibold text-[#1a0533]">{template.name}</p>
-                <p className="mt-1 text-xs text-[#1a0533]/70">{template.category.replace("_", " ")}</p>
-                <p className="mt-2 text-xs font-medium text-[#e91e8c]">
+                <p className="text-sm font-semibold text-[#16120E]">{template.name}</p>
+                <p className="mt-1 text-xs text-[#16120E]/70">{template.category.replace("_", " ")}</p>
+                <p className="mt-2 text-xs font-medium text-[#F55028]">
                   {locked ? "Premium bloqueado" : "Disponível para carregar"}
                 </p>
               </button>

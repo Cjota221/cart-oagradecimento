@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = "primary" | "secondary";
+type ButtonVariant = "primary" | "secondary" | "accent" | "ghost";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -13,14 +13,20 @@ export default function Button({
   ...props
 }: Props) {
   const base =
-    "inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition";
-  const styles =
-    variant === "primary"
-      ? "text-white shadow-[0_10px_30px_-12px_rgba(108,46,185,0.9)] bg-[linear-gradient(90deg,#6c2eb9,#e91e8c)] hover:brightness-110"
-      : "border border-[#6c2eb9]/20 bg-white text-[#1a0533] hover:border-[#6c2eb9]/40";
+    "inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm transition font-jakarta";
+  const styles = {
+    primary: "bg-[#1847CC] hover:bg-[#1038A8] text-white font-bold tracking-[-0.01em]",
+    accent: "bg-[#F55028] hover:bg-[#D93D18] text-white font-bold tracking-[-0.01em]",
+    secondary: "bg-[#EEF2FC] hover:bg-[#D8E3FA] text-[#1847CC] font-semibold border border-[#C8D4F8]",
+    ghost: "bg-transparent text-[#9A948D] font-medium border border-[#E6E2DC] hover:bg-[#F5F3EF]",
+  };
 
   return (
-    <button className={`${base} ${styles} ${className}`} {...props}>
+    <button
+      style={{ fontFamily: "var(--font-jakarta), sans-serif" }}
+      className={`${base} ${styles[variant]} ${className}`}
+      {...props}
+    >
       {children}
     </button>
   );

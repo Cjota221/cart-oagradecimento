@@ -78,14 +78,14 @@ function LoginForm() {
       <Card className="w-full p-6">
         <Link
           href="/"
-          className="mb-3 flex items-center gap-2 text-sm font-bold text-[#1a0533]"
+          className="mb-3 flex items-center gap-2 text-sm font-bold text-[#16120E]"
         >
           <span className="text-xl">🖨️</span> Imprimax
         </Link>
-        <h1 className="text-2xl font-extrabold text-[#1a0533]">
+        <h1 className="text-2xl font-extrabold text-[#16120E]">
           {mode === "login" ? "Entrar" : "Criar conta"}
         </h1>
-        <p className="mt-1 text-sm text-[#1a0533]/70">
+        <p className="mt-1 text-sm text-[#16120E]/70">
           {mode === "login"
             ? "Acesse seu painel Imprimax."
             : "Crie sua conta gratuita. Pra desbloquear templates premium, compre seu acesso."}
@@ -106,7 +106,7 @@ function LoginForm() {
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
           {mode === "signup" && (
             <div>
-              <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+              <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
                 Nome
               </label>
               <Input
@@ -117,7 +117,7 @@ function LoginForm() {
             </div>
           )}
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+            <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
               E-mail
             </label>
             <Input
@@ -128,7 +128,7 @@ function LoginForm() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+            <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
               Senha
             </label>
             <Input
@@ -152,14 +152,14 @@ function LoginForm() {
           <button
             type="button"
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="font-semibold text-[#6c2eb9] underline-offset-2 hover:underline"
+            className="font-semibold text-[#1847CC] underline-offset-2 hover:underline"
           >
             {mode === "login" ? "Ainda não tenho conta" : "Já tenho conta"}
           </button>
           {mode === "login" && (
             <Link
               href="/checkout"
-              className="font-semibold text-[#e91e8c] underline-offset-2 hover:underline"
+              className="font-semibold text-[#F55028] underline-offset-2 hover:underline"
             >
               Comprar acesso →
             </Link>

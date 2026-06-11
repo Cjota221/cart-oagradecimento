@@ -128,15 +128,15 @@ export default function CheckoutPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-[#6c2eb9]/10 bg-white">
+      <header className="border-b border-[#1847CC]/10 bg-white">
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2 font-extrabold text-[#1a0533]">
+          <Link href="/" className="flex items-center gap-2 font-extrabold text-[#16120E]">
             <span className="text-2xl">🖨️</span>
             <span className="text-xl tracking-tight">Imprimax</span>
           </Link>
           <Link
             href="/login"
-            className="text-sm font-semibold text-[#1a0533]/70 hover:text-[#6c2eb9]"
+            className="text-sm font-semibold text-[#16120E]/70 hover:text-[#1847CC]"
           >
             Ja tenho conta
           </Link>
@@ -149,16 +149,16 @@ export default function CheckoutPage() {
           <div className="space-y-4">
             {!pix ? (
               <Card className="p-6">
-                <h1 className="text-2xl font-extrabold text-[#1a0533] md:text-3xl">
+                <h1 className="text-2xl font-extrabold text-[#16120E] md:text-3xl">
                   Garantir meu acesso vitalicio
                 </h1>
-                <p className="mt-1 text-sm text-[#1a0533]/70">
+                <p className="mt-1 text-sm text-[#16120E]/70">
                   Preencha seus dados pra liberar o Imprimax assim que o PIX cair.
                 </p>
 
                 <form onSubmit={onSubmit} className="mt-6 space-y-4">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+                    <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
                       Nome completo
                     </label>
                     <Input
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+                    <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
                       Email
                     </label>
                     <Input
@@ -181,7 +181,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+                    <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
                       Confirmar email
                     </label>
                     <Input
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#1a0533]/75">
+                    <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
                       Senha (minimo 6 caracteres)
                     </label>
                     <Input
@@ -216,7 +216,7 @@ export default function CheckoutPage() {
                       : `Pagar ${formatBRL(price)} via PIX →`}
                   </Button>
 
-                  <p className="text-center text-xs text-[#1a0533]/60">
+                  <p className="text-center text-xs text-[#16120E]/60">
                     🔒 Pagamento seguro processado pelo Mercado Pago
                   </p>
                 </form>
@@ -229,16 +229,16 @@ export default function CheckoutPage() {
                     <h2 className="text-2xl font-extrabold text-emerald-700">
                       Pagamento confirmado!
                     </h2>
-                    <p className="text-sm text-[#1a0533]/70">
+                    <p className="text-sm text-[#16120E]/70">
                       Redirecionando pro login... Use o email e a senha que voce cadastrou.
                     </p>
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-xl font-extrabold text-[#1a0533]">
+                    <h2 className="text-xl font-extrabold text-[#16120E]">
                       Pague com PIX pra liberar
                     </h2>
-                    <p className="mt-1 text-sm text-[#1a0533]/70">
+                    <p className="mt-1 text-sm text-[#16120E]/70">
                       Aponte a camera do seu app do banco pro QR code ou copie o codigo abaixo.
                     </p>
 
@@ -248,21 +248,21 @@ export default function CheckoutPage() {
                         <img
                           src={`data:image/png;base64,${pix.qr_code_base64}`}
                           alt="QR Code PIX"
-                          className="h-56 w-56 rounded-xl border border-[#6c2eb9]/10 bg-white p-2"
+                          className="h-56 w-56 rounded-xl border border-[#1847CC]/10 bg-white p-2"
                         />
                       </div>
                     ) : null}
 
                     {pix.qr_code ? (
                       <div className="mt-4 space-y-2">
-                        <label className="text-xs font-semibold uppercase text-[#1a0533]/70">
+                        <label className="text-xs font-semibold uppercase text-[#16120E]/70">
                           PIX copia e cola
                         </label>
                         <textarea
                           readOnly
                           value={pix.qr_code}
                           rows={3}
-                          className="w-full rounded-xl border border-[#6c2eb9]/20 bg-white p-3 text-xs"
+                          className="w-full rounded-xl border border-[#1847CC]/20 bg-white p-3 text-xs"
                           onClick={(e) =>
                             (e.target as HTMLTextAreaElement).select()
                           }
@@ -277,11 +277,11 @@ export default function CheckoutPage() {
                       </div>
                     ) : null}
 
-                    <div className="mt-4 rounded-xl bg-[#f5f0ff] p-3 text-center text-sm">
-                      <p className="font-semibold text-[#6c2eb9]">
+                    <div className="mt-4 rounded-xl bg-[#FEFCF9] p-3 text-center text-sm">
+                      <p className="font-semibold text-[#1847CC]">
                         ⏳ Aguardando pagamento...
                       </p>
-                      <p className="mt-1 text-xs text-[#1a0533]/60">
+                      <p className="mt-1 text-xs text-[#16120E]/60">
                         Esta tela atualiza sozinha quando o PIX cair (uns 30s).
                       </p>
                     </div>
@@ -291,7 +291,7 @@ export default function CheckoutPage() {
                         href={pix.ticket_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 block text-center text-xs text-[#6c2eb9] underline-offset-2 hover:underline"
+                        className="mt-3 block text-center text-xs text-[#1847CC] underline-offset-2 hover:underline"
                       >
                         Ver detalhes no Mercado Pago
                       </a>
@@ -304,30 +304,30 @@ export default function CheckoutPage() {
 
           {/* Resumo */}
           <Card className="h-fit p-6">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#e91e8c]">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#F55028]">
               Resumo do pedido
             </h3>
-            <div className="mt-4 flex items-start gap-3 rounded-xl bg-gradient-to-br from-[#6c2eb9]/10 to-[#e91e8c]/10 p-4">
+            <div className="mt-4 flex items-start gap-3 rounded-xl bg-gradient-to-br from-[#1847CC]/10 to-[#F55028]/10 p-4">
               <div className="text-3xl">🖨️</div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-[#1a0533]">
+                <p className="text-sm font-bold text-[#16120E]">
                   Imprimax — Acesso Vitalicio
                 </p>
-                <p className="text-xs text-[#1a0533]/70">
+                <p className="text-xs text-[#16120E]/70">
                   Pagamento unico. Sem mensalidade.
                 </p>
               </div>
             </div>
-            <ul className="mt-4 space-y-2 text-sm text-[#1a0533]/80">
+            <ul className="mt-4 space-y-2 text-sm text-[#16120E]/80">
               <li>✓ Acesso vitalicio ao gerador</li>
               <li>✓ Templates premium (em breve)</li>
               <li>✓ Atualizacoes gratuitas pra sempre</li>
               <li>✓ Sem limite de impressoes</li>
             </ul>
-            <div className="mt-5 border-t border-[#6c2eb9]/10 pt-4">
+            <div className="mt-5 border-t border-[#1847CC]/10 pt-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-[#1a0533]/70">Total</span>
-                <span className="text-2xl font-extrabold text-[#6c2eb9]">
+                <span className="text-sm text-[#16120E]/70">Total</span>
+                <span className="text-2xl font-extrabold text-[#1847CC]">
                   {formatBRL(price)}
                 </span>
               </div>

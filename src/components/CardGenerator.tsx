@@ -230,7 +230,7 @@ export default function CardGenerator({
             ) : (
               row === 0 &&
               col === 0 && (
-                <span className="m-auto text-xs text-[#1a0533]/35">
+                <span className="m-auto text-xs text-[#16120E]/35">
                   {side === "front" ? "Adicione arte de frente" : "Adicione arte de verso"}
                 </span>
               )
@@ -276,7 +276,7 @@ export default function CardGenerator({
     <div className="imprimax-generator grid gap-4 lg:grid-cols-[1fr_360px]">
       <Card className="imprimax-preview-card relative overflow-auto p-4">
         {statusMessage && (
-          <div className="no-print mb-3 rounded-xl bg-[#1a0533] px-3 py-2 text-xs font-medium text-white">
+          <div className="no-print mb-3 rounded-xl bg-[#16120E] px-3 py-2 text-xs font-medium text-white">
             {statusMessage}
           </div>
         )}
@@ -284,13 +284,13 @@ export default function CardGenerator({
         <div className="no-print mb-3 flex items-center gap-2">
           <button
             onClick={() => setCurrentView("front")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#6c2eb9]/15 text-[#6c2eb9]" : "text-[#1a0533]/60"}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#1847CC]/15 text-[#1847CC]" : "text-[#16120E]/60"}`}
           >
             Ver frente
           </button>
           <button
             onClick={() => setCurrentView("back")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "back" ? "bg-[#6c2eb9]/15 text-[#6c2eb9]" : "text-[#1a0533]/60"}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "back" ? "bg-[#1847CC]/15 text-[#1847CC]" : "text-[#16120E]/60"}`}
           >
             Ver verso
           </button>
@@ -337,28 +337,29 @@ export default function CardGenerator({
 
       <div className="no-print space-y-4">
         <Card>
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#1a0533]/70">Suas artes</h3>
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">Suas artes</h3>
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-[#1a0533]">
+            <label className="block text-sm font-medium text-[#16120E]">
               Arte da frente
               <Input type="file" accept="image/*" onChange={(e) => onImageUpload(e, "front")} className="mt-1" />
             </label>
-            <label className="block text-sm font-medium text-[#1a0533]">
+            <label className="block text-sm font-medium text-[#16120E]">
               Arte do verso
               <Input type="file" accept="image/*" onChange={(e) => onImageUpload(e, "back")} className="mt-1" />
             </label>
           </div>
-          {loadingSide && <p className="mt-2 text-xs text-[#e91e8c]">Carregando arte {loadingSide}...</p>}
+          {loadingSide && <p className="mt-2 text-xs text-[#F55028]">Carregando arte {loadingSide}...</p>}
         </Card>
 
         <Card>
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#1a0533]/70">
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">
             📐 Tamanho da arte
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <label className="text-xs">
               Largura (cm)
               <Input
+                mono
                 type="number"
                 step="0.1"
                 min={ARTE_MIN_CM}
@@ -371,6 +372,7 @@ export default function CardGenerator({
             <label className="text-xs">
               Altura (cm)
               <Input
+                mono
                 type="number"
                 step="0.1"
                 min={ARTE_MIN_CM}
@@ -384,7 +386,7 @@ export default function CardGenerator({
           <label className="mt-3 block text-xs">
             Formato do papel
             <select
-              className="mt-1 w-full rounded-xl border border-[#6c2eb9]/20 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-[#1847CC]/20 bg-white px-3 py-2 text-sm"
               value={paperFormat}
               onChange={(e) => setPaperFormat(e.target.value as PaperFormat)}
             >
@@ -396,7 +398,7 @@ export default function CardGenerator({
           <button
             type="button"
             onClick={handleCalcularGrid}
-            className="imprimax-btn mt-3 w-full justify-center"
+            className="ix-btn-accent mt-3 w-full justify-center"
           >
             ✨ Calcular grid automaticamente
           </button>
@@ -415,25 +417,25 @@ export default function CardGenerator({
         </Card>
 
         <Card>
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#1a0533]/70">Formato e grade</h3>
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">Formato e grade</h3>
           <div className="grid grid-cols-3 gap-2">
             <label className="text-xs">
               Colunas
-              <Input type="number" min={1} max={10} value={safeCols} onChange={(e) => setCols(Number(e.target.value))} />
+              <Input mono type="number" min={1} max={10} value={safeCols} onChange={(e) => setCols(Number(e.target.value))} />
             </label>
             <label className="text-xs">
               Linhas
-              <Input type="number" min={1} max={10} value={safeRows} onChange={(e) => setRows(Number(e.target.value))} />
+              <Input mono type="number" min={1} max={10} value={safeRows} onChange={(e) => setRows(Number(e.target.value))} />
             </label>
             <label className="text-xs">
               Gap (mm)
-              <Input type="number" min={0} max={20} value={safeGap} onChange={(e) => setGap(Number(e.target.value))} />
+              <Input mono type="number" min={0} max={20} value={safeGap} onChange={(e) => setGap(Number(e.target.value))} />
             </label>
           </div>
           <label className="mt-3 block text-xs">
             Orientação
             <select
-              className="mt-1 w-full rounded-xl border border-[#6c2eb9]/20 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-[#1847CC]/20 bg-white px-3 py-2 text-sm"
               value={orientation}
               onChange={(e) => setOrientation(e.target.value as Orientation)}
             >
@@ -441,7 +443,7 @@ export default function CardGenerator({
               <option value="landscape">Paisagem</option>
             </select>
           </label>
-          <div className="mt-3 space-y-1 text-xs text-[#1a0533]/70">
+          <div className="mt-3 space-y-1 text-xs text-[#16120E]/70">
             <p>Tamanho ideal: <strong>{cardSize.mm}</strong></p>
             <p>{cardSize.px}</p>
           </div>

@@ -1,11 +1,16 @@
 import { InputHTMLAttributes } from "react";
 
-type Props = InputHTMLAttributes<HTMLInputElement>;
+type Props = InputHTMLAttributes<HTMLInputElement> & { mono?: boolean };
 
-export default function Input({ className = "", ...props }: Props) {
+export default function Input({ className = "", mono = false, ...props }: Props) {
   return (
     <input
-      className={`w-full rounded-xl border border-[#6c2eb9]/20 bg-white px-3 py-2 text-sm text-[#1a0533] outline-none focus:border-[#6c2eb9]/60 ${className}`}
+      style={{
+        fontFamily: mono
+          ? "var(--font-dm-mono), monospace"
+          : "var(--font-dm-sans), sans-serif",
+      }}
+      className={`w-full rounded-lg border border-[#E6E2DC] bg-white px-3 py-2.5 text-sm text-[#16120E] outline-none focus:border-[#1847CC] focus:border-[1.5px] ${className}`}
       {...props}
     />
   );

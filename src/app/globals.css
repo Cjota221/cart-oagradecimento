@@ -1,35 +1,116 @@
 @import "tailwindcss";
 
 :root {
-  --imprimax-primary: #6c2eb9;
-  --imprimax-secondary: #e91e8c;
-  --imprimax-background: #f5f0ff;
-  --imprimax-text: #1a0533;
-  --imprimax-accent: #ff6eb4;
+  --ix-canvas:        #FEFCF9;
+  --ix-ink:           #16120E;
+  --ix-brand:         #1847CC;
+  --ix-brand-dark:    #1038A8;
+  --ix-brand-soft:    #EEF2FC;
+  --ix-brand-border:  #C8D4F8;
+  --ix-accent:        #F55028;
+  --ix-accent-dark:   #D93D18;
+  --ix-accent-soft:   #FFF1EE;
+  --ix-accent-border: #F8C5B8;
+  --ix-mid:           #9A948D;
+  --ix-border:        #E6E2DC;
+  --ix-surface:       #FFFFFF;
+  --ix-success-soft:  #EAF3DE;
+  --ix-success-text:  #3B6D11;
 }
 
 @theme inline {
-  --color-imprimax-primary: var(--imprimax-primary);
-  --color-imprimax-secondary: var(--imprimax-secondary);
-  --color-imprimax-background: var(--imprimax-background);
-  --color-imprimax-text: var(--imprimax-text);
-  --color-imprimax-accent: var(--imprimax-accent);
-  --font-sans: var(--font-poppins);
+  --color-ix-canvas:       var(--ix-canvas);
+  --color-ix-ink:          var(--ix-ink);
+  --color-ix-brand:        var(--ix-brand);
+  --color-ix-brand-dark:   var(--ix-brand-dark);
+  --color-ix-brand-soft:   var(--ix-brand-soft);
+  --color-ix-accent:       var(--ix-accent);
+  --color-ix-accent-dark:  var(--ix-accent-dark);
+  --color-ix-accent-soft:  var(--ix-accent-soft);
+  --color-ix-mid:          var(--ix-mid);
+  --color-ix-border:       var(--ix-border);
+  --color-ix-surface:      var(--ix-surface);
+  --font-sans:    var(--font-dm-sans), sans-serif;
+  --font-jakarta: var(--font-jakarta), sans-serif;
+  --font-mono:    var(--font-dm-mono), monospace;
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(233, 30, 140, 0.08), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(108, 46, 185, 0.12), transparent 35%),
-    var(--imprimax-background);
-  color: var(--imprimax-text);
-  font-family: var(--font-poppins), sans-serif;
+  background: var(--ix-canvas);
+  color: var(--ix-ink);
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.font-jakarta { font-family: var(--font-jakarta), sans-serif; }
+.font-mono-ix { font-family: var(--font-dm-mono), monospace; }
+
+.ix-btn-primary {
+  @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 font-semibold text-white transition;
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  background: var(--ix-brand);
+  letter-spacing: -0.01em;
+}
+.ix-btn-primary:hover { background: var(--ix-brand-dark); }
+
+.ix-btn-accent {
+  @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 font-semibold text-white transition;
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  background: var(--ix-accent);
+  letter-spacing: -0.01em;
+}
+.ix-btn-accent:hover { background: var(--ix-accent-dark); }
+
+.ix-btn-secondary {
+  @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 transition;
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  background: var(--ix-brand-soft);
+  color: var(--ix-brand);
+  border: 0.5px solid var(--ix-brand-border);
+}
+
+.ix-btn-ghost {
+  @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 transition;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-weight: 500;
+  color: var(--ix-mid);
+  border: 0.5px solid var(--ix-border);
 }
 
 .imprimax-btn {
-  @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold text-white transition hover:brightness-105;
-  background: linear-gradient(90deg, var(--imprimax-primary), var(--imprimax-secondary));
+  @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 font-semibold text-white transition;
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  background: var(--ix-brand);
+  letter-spacing: -0.01em;
 }
+.imprimax-btn:hover {
+  background: var(--ix-brand-dark);
+}
+
+.ix-card {
+  background: var(--ix-surface);
+  border: 0.5px solid var(--ix-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.ix-input {
+  width: 100%;
+  border: 0.5px solid var(--ix-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 15px;
+  color: var(--ix-ink);
+  background: var(--ix-surface);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+.ix-input:focus { border-color: var(--ix-brand); border-width: 1.5px; }
+.ix-input.mono { font-family: var(--font-dm-mono), monospace; font-weight: 500; }
 
 .a4-sheet {
   width: 210mm;
@@ -37,103 +118,19 @@ body {
   background: white;
   padding: 10mm;
   box-sizing: border-box;
-  box-shadow: 0 18px 44px rgba(26, 5, 51, 0.14);
 }
 
-.a4-sheet.landscape {
-  width: 297mm;
-  height: 210mm;
-}
+.a4-sheet.landscape { width: 297mm; height: 210mm; }
 
-.card-grid {
-  display: grid;
-  width: 100%;
-  height: 100%;
-}
-
-.card-tile {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-}
-
-.card-tile img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.card-tile-guides .card-tile {
-  border: 1px dashed rgba(108, 46, 185, 0.3);
-}
+.card-grid { display: grid; width: 100%; height: 100%; }
+.card-tile { position: relative; overflow: hidden; display: flex; align-items: stretch; justify-content: stretch; }
+.card-tile img { width: 100%; height: 100%; object-fit: cover; }
+.card-tile-guides .card-tile { border: 1px dashed rgba(24, 71, 204, 0.2); }
 
 @media print {
-  @page {
-    margin: 0;
-  }
-
-  html,
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 210mm !important;
-    height: 297mm !important;
-    overflow: hidden !important;
-    background: white !important;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .imprimax-generator {
-    all: unset !important;
-    display: block !important;
-  }
-
-  .imprimax-preview-card {
-    all: unset !important;
-    display: block !important;
-  }
-
-  .imprimax-zoom {
-    transform: none !important;
-    display: block !important;
-  }
-
-  .a4-sheet {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 210mm !important;
-    height: 297mm !important;
-    padding: 10mm !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-    display: block !important;
-  }
-
-  .a4-sheet.landscape {
-    width: 297mm !important;
-    height: 210mm !important;
-  }
-
-  .card-grid {
-    display: grid !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  .card-tile-guides .card-tile {
-    border: 0 !important;
-  }
-
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-  }
+  @page { margin: 0; }
+  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  .no-print { display: none !important; }
+  .a4-sheet { position: absolute !important; top: 0 !important; left: 0 !important; margin: 0 !important; box-shadow: none !important; }
+  .card-tile-guides .card-tile { border: 0 !important; }
 }
