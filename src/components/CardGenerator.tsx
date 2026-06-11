@@ -226,22 +226,15 @@ export default function CardGenerator({
     window.setTimeout(() => setStatusMessage(null), 2600);
   }
 
-  function applyAutoGridFromImage(image: HTMLImageElement) {
-    const { colunas, linhas, total } = calcularGridPorProporcao(
-      image.naturalWidth,
-      image.naturalHeight,
-      paperFormat,
-      orientation,
-      safeGap,
-    );
-    setCols(colunas);
-    setRows(linhas);
+  function applyAutoGridFromImage(_image: HTMLImageElement) {
+    setCols(3);
+    setRows(3);
     setCalcResultado({
       ok: true,
-      colunas,
-      linhas,
-      total,
-      mensagem: `Grade ajustada pela proporcao da arte (${image.naturalWidth}x${image.naturalHeight}px): ${colunas} colunas x ${linhas} linhas.`,
+      colunas: 3,
+      linhas: 3,
+      total: 9,
+      mensagem: "Grade padrão 3x3 aplicada. Ajuste manualmente se necessário.",
     });
   }
 
