@@ -79,10 +79,13 @@ function LoginForm() {
       <Card className="w-full p-6">
         <Link
           href="/"
-          className="mb-3 flex items-center gap-2 text-sm font-bold text-[#16120E]"
+          className="mb-4 inline-flex"
         >
-          <Icon name="printer" className="size-5 text-[#FF5028]" />
-          Imprimax
+          <img
+            src="/brand/logo/logo%20principal.png"
+            alt="Imprimax"
+            className="h-[58px] w-auto"
+          />
         </Link>
         <h1 className="text-2xl font-extrabold text-[#16120E]">
           {mode === "login" ? "Entrar" : "Criar conta"}
