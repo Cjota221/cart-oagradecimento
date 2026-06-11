@@ -16,7 +16,12 @@ export async function getSupabaseServerClient() {
           cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>,
         ) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
+            try {
+              cookieStore.set(name, value, options);
+            } catch {
+              // Server Components cannot always persist refreshed auth cookies.
+              // Route handlers and middleware will handle cookie writes when available.
+            }
           });
         },
       },
