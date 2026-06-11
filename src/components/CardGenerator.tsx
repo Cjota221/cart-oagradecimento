@@ -4,18 +4,16 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import Card from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
-import TemplateGallery, { TemplateItem } from "@/components/TemplateGallery";
+import TemplateGallery, { TemplateItem, KitItem } from "@/components/TemplateGallery";
 
 const PAGE_PADDING_MM = 20;
 
-// Dimensoes do papel em mm (largura x altura no modo retrato).
 const PAPER_DIMENSIONS_MM = {
   A4: { w: 210, h: 297 },
   A5: { w: 148, h: 210 },
   Carta: { w: 216, h: 279 },
 } as const;
 
-// Area util em cm (descontando 5mm de margem em cada lado = 10mm total).
 const PAPER_USABLE_CM = {
   A4: { w: 20.0, h: 28.7 },
   A5: { w: 13.8, h: 20.0 },
@@ -29,6 +27,7 @@ const ARTE_MAX_CM = 30;
 type Props = {
   enableTemplates?: boolean;
   templates?: TemplateItem[];
+  kits?: KitItem[];
   hasAccess?: boolean;
 };
 
@@ -59,18 +58,55 @@ function calcularGridPorProporcao(
   orientation: Orientation,
   gapMm: number,
 ): { colunas: number; linhas: number; total: number } {
-  void imageWidth;
-  void imageHeight;
-  void papel;
-  void orientation;
-  void gapMm;
+  const base = PAPER_DIMENSIONS_MM[papel];
+  const page =
+    orientation === "landscape"
+      ? { w: base.h - PAGE_PADDING_MM, h: base.w - PAGE_PADDING_MM }
+      : { w: base.w - PAGE_PADDING_MM, h: base.h - PAGE_PADDING_MM };
+  const imageRatio = imageWidth / imageHeight;
 
-  return { colunas: 3, linhas: 3, total: 9 };
+  let best = {
+    colunas: 1,
+    linhas: 1,
+    total: 1,
+    score: Number.POSITIVE_INFINITY,
+  };
+
+  for (let colunas = 1; colunas <= 10; colunas += 1) {
+    for (let linhas = 1; linhas <= 10; linhas += 1) {
+      const cellWidth = (page.w - (colunas - 1) * gapMm) / colunas;
+      const cellHeight = (page.h - (linhas - 1) * gapMm) / linhas;
+      if (cellWidth <= 0 || cellHeight <= 0) continue;
+
+      const cellRatio = cellWidth / cellHeight;
+      const ratioPenalty = Math.abs(Math.log(cellRatio / imageRatio));
+      const count = colunas * linhas;
+      const score = ratioPenalty * 18 - count;
+
+      if (score < best.score) {
+        best = { colunas, linhas, total: count, score };
+      }
+    }
+  }
+
+  return { colunas: best.colunas, linhas: best.linhas, total: best.total };
+}
+
+function calcZoomInicial(): number {
+  if (typeof window === "undefined") return 45;
+  const viewportW = window.innerWidth;
+  if (viewportW < 768) {
+    const available = viewportW - 32;
+    const a4WidthPx = (210 * 96) / 25.4;
+    return Math.max(20, Math.min(Math.floor((available / a4WidthPx) * 100), 80));
+  }
+  return 48;
 }
 
 export default function CardGenerator({
   enableTemplates = false,
   templates = [],
+  kits = [],
   hasAccess = false,
 }: Props) {
   const [frontImage, setFrontImage] = useState<string | null>(null);
@@ -83,12 +119,12 @@ export default function CardGenerator({
   const [orientation, setOrientation] = useState<Orientation>("portrait");
   const [currentView, setCurrentView] = useState<View>("front");
   const [showGuides, setShowGuides] = useState(true);
-  const [zoom, setZoom] = useState(76);
+  const [zoom, setZoom] = useState(() => calcZoomInicial());
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loadingSide, setLoadingSide] = useState<Side | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Calculo de grid por dimensoes em cm
   const [paperFormat, setPaperFormat] = useState<PaperFormat>("A4");
   const [arteWidthCm, setArteWidthCm] = useState<string>("");
   const [arteHeightCm, setArteHeightCm] = useState<string>("");
@@ -106,6 +142,21 @@ export default function CardGenerator({
     setGap(safeGap);
   }, [safeRows, safeCols, safeGap]);
 
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+
+  useEffect(() => {
+    function onResize() {
+      setZoom(calcZoomInicial());
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   const paperDims = useMemo(() => {
     const base = PAPER_DIMENSIONS_MM[paperFormat];
     return orientation === "landscape"
@@ -118,7 +169,6 @@ export default function CardGenerator({
     const availableHeight = paperDims.h - PAGE_PADDING_MM;
     const cardWidthMm = Math.max(0, (availableWidth - (safeCols - 1) * safeGap) / safeCols);
     const cardHeightMm = Math.max(0, (availableHeight - (safeRows - 1) * safeGap) / safeRows);
-
     return {
       mm: `${cardWidthMm.toFixed(1)} mm x ${cardHeightMm.toFixed(1)} mm`,
       px: `(${Math.round(cardWidthMm * (300 / 25.4))} px x ${Math.round(cardHeightMm * (300 / 25.4))} px a 300 DPI)`,
@@ -127,7 +177,6 @@ export default function CardGenerator({
 
   const hasArtwork = Boolean(frontImage || backImage);
 
-  // Limpa o resultado quando o usuario muda formato (a calc deixa de valer)
   useEffect(() => {
     setCalcResultado(null);
   }, [paperFormat]);
@@ -137,45 +186,27 @@ export default function CardGenerator({
     const alturaCm = parseFloat(arteHeightCm.replace(",", "."));
 
     if (!Number.isFinite(larguraCm) || !Number.isFinite(alturaCm)) {
-      setCalcResultado({
-        ok: false,
-        mensagem: "Informe largura e altura em cm.",
-      });
+      setCalcResultado({ ok: false, mensagem: "Informe largura e altura em cm." });
       return;
     }
     if (
-      larguraCm < ARTE_MIN_CM ||
-      alturaCm < ARTE_MIN_CM ||
-      larguraCm > ARTE_MAX_CM ||
-      alturaCm > ARTE_MAX_CM
+      larguraCm < ARTE_MIN_CM || alturaCm < ARTE_MIN_CM ||
+      larguraCm > ARTE_MAX_CM || alturaCm > ARTE_MAX_CM
     ) {
-      setCalcResultado({
-        ok: false,
-        mensagem: `Use dimensoes entre ${ARTE_MIN_CM} e ${ARTE_MAX_CM} cm.`,
-      });
+      setCalcResultado({ ok: false, mensagem: `Use dimensoes entre ${ARTE_MIN_CM} e ${ARTE_MAX_CM} cm.` });
       return;
     }
 
     const pagina = PAPER_USABLE_CM[paperFormat];
     if (larguraCm > pagina.w || alturaCm > pagina.h) {
-      setCalcResultado({
-        ok: false,
-        mensagem: "Arte maior que o papel selecionado. Revise as dimensoes.",
-      });
+      setCalcResultado({ ok: false, mensagem: "Arte maior que o papel selecionado. Revise as dimensoes." });
       return;
     }
 
-    const { colunas, linhas, total } = calcularGridPorCm(
-      larguraCm,
-      alturaCm,
-      paperFormat,
-    );
+    const { colunas, linhas, total } = calcularGridPorCm(larguraCm, alturaCm, paperFormat);
 
     if (colunas === 0 || linhas === 0) {
-      setCalcResultado({
-        ok: false,
-        mensagem: "Arte maior que o papel selecionado. Revise as dimensoes.",
-      });
+      setCalcResultado({ ok: false, mensagem: "Arte maior que o papel selecionado. Revise as dimensoes." });
       return;
     }
 
@@ -203,7 +234,6 @@ export default function CardGenerator({
       orientation,
       safeGap,
     );
-
     setCols(colunas);
     setRows(linhas);
     setCalcResultado({
@@ -211,20 +241,15 @@ export default function CardGenerator({
       colunas,
       linhas,
       total,
-      mensagem: `Grade padrao aplicada ao template (${image.naturalWidth}x${image.naturalHeight}px): ${colunas} colunas x ${linhas} linhas.`,
+      mensagem: `Grade ajustada pela proporcao da arte (${image.naturalWidth}x${image.naturalHeight}px): ${colunas} colunas x ${linhas} linhas.`,
     });
   }
 
   function loadImageForAutoGrid(src: string, onReady?: () => void) {
     const image = new Image();
     image.crossOrigin = "anonymous";
-    image.onload = () => {
-      applyAutoGridFromImage(image);
-      onReady?.();
-    };
-    image.onerror = () => {
-      onReady?.();
-    };
+    image.onload = () => { applyAutoGridFromImage(image); onReady?.(); };
+    image.onerror = () => { onReady?.(); };
     image.src = src;
   }
 
@@ -237,20 +262,13 @@ export default function CardGenerator({
       event.target.value = "";
       return;
     }
-
     setLoadingSide(side);
     const reader = new FileReader();
-    reader.onerror = () => {
-      setLoadingSide(null);
-      showMessage("Falha ao ler o arquivo.");
-    };
+    reader.onerror = () => { setLoadingSide(null); showMessage("Falha ao ler o arquivo."); };
     reader.onload = () => {
       const data = String(reader.result || "");
       const image = new Image();
-      image.onerror = () => {
-        setLoadingSide(null);
-        showMessage("Imagem corrompida ou inválida.");
-      };
+      image.onerror = () => { setLoadingSide(null); showMessage("Imagem corrompida ou inválida."); };
       image.onload = () => {
         if (side === "front") setFrontImage(data);
         if (side === "back") setBackImage(data);
@@ -280,11 +298,17 @@ export default function CardGenerator({
               <img
                 src={imageSrc}
                 alt={`Arte ${side}`}
-                style={{ transform: rotate ? "rotate(90deg)" : "none" }}
+                style={{
+                  transform: rotate ? "rotate(90deg)" : "none",
+                  imageRendering: "high-quality" as React.CSSProperties["imageRendering"],
+                  display: "block",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
               />
             ) : (
-              row === 0 &&
-              col === 0 && (
+              row === 0 && col === 0 && (
                 <span className="m-auto text-xs text-[#16120E]/35">
                   {side === "front" ? "Adicione arte de frente" : "Adicione arte de verso"}
                 </span>
@@ -301,21 +325,14 @@ export default function CardGenerator({
     if (side === "front" && !frontImage) return showMessage("Adicione a arte da frente antes de imprimir.");
     if (side === "back" && !backImage) return showMessage("Adicione a arte do verso antes de imprimir.");
     setCurrentView(side);
-
     window.setTimeout(() => {
       const zoomEl = zoomRef.current;
       const oldTransform = zoomEl?.style.transform ?? "";
-      if (zoomEl) {
-        zoomEl.style.transform = "none";
-      }
-
+      if (zoomEl) zoomEl.style.transform = "none";
       const restore = () => {
-        if (zoomEl) {
-          zoomEl.style.transform = oldTransform;
-        }
+        if (zoomEl) zoomEl.style.transform = oldTransform;
         window.removeEventListener("afterprint", restore);
       };
-
       window.addEventListener("afterprint", restore);
       window.print();
     }, 100);
@@ -343,15 +360,25 @@ export default function CardGenerator({
           <Card className="p-4">
             <TemplateGallery
               templates={templates}
+              kits={kits}
               hasAccess={hasAccess}
               selectedTemplateId={selectedTemplateId}
               onSelect={handleTemplateSelect}
+              onKitSelect={(kit) => {
+                const primeiro = kit.templates?.[0];
+                if (primeiro) handleTemplateSelect(primeiro);
+                showMessage(`Kit "${kit.name}" carregado. ${kit.templates?.length || 0} peças disponíveis.`);
+              }}
             />
           </Card>
         </aside>
       )}
 
-      <Card className="imprimax-preview-card relative min-h-[540px] overflow-auto p-4">
+      <Card
+        className={`imprimax-preview-card relative overflow-auto p-4 ${
+          isMobile ? "min-h-[calc(100vh-320px)]" : "min-h-[540px]"
+        }`}
+      >
         {statusMessage && (
           <div className="no-print mb-3 rounded-xl bg-[#16120E] px-3 py-2 text-xs font-medium text-white">
             {statusMessage}
@@ -376,7 +403,7 @@ export default function CardGenerator({
               <div className="ml-auto flex items-center gap-2">
                 <input
                   type="range"
-                  min={55}
+                  min={20}
                   max={150}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
@@ -391,14 +418,14 @@ export default function CardGenerator({
               style={{
                 transform: `scale(${zoom / 100})`,
                 transformOrigin: "top center",
-              }}
+                transition: "transform 200ms ease",
+                willChange: "transform",
+                WebkitFontSmoothing: "antialiased",
+              } as React.CSSProperties}
             >
               <div
                 className={`a4-sheet ${orientation === "landscape" ? "landscape" : ""} ${showGuides ? "card-tile-guides" : ""}`}
-                style={{
-                  width: `${paperDims.w}mm`,
-                  height: `${paperDims.h}mm`,
-                }}
+                style={{ width: `${paperDims.w}mm`, height: `${paperDims.h}mm` }}
               >
                 <div
                   className="card-grid"
@@ -478,29 +505,11 @@ export default function CardGenerator({
           <div className="grid grid-cols-2 gap-2">
             <label className="text-xs">
               Largura (cm)
-              <Input
-                mono
-                type="number"
-                step="0.1"
-                min={ARTE_MIN_CM}
-                max={ARTE_MAX_CM}
-                placeholder="ex: 6"
-                value={arteWidthCm}
-                onChange={(e) => setArteWidthCm(e.target.value)}
-              />
+              <Input mono type="number" step="0.1" min={ARTE_MIN_CM} max={ARTE_MAX_CM} placeholder="ex: 6" value={arteWidthCm} onChange={(e) => setArteWidthCm(e.target.value)} />
             </label>
             <label className="text-xs">
               Altura (cm)
-              <Input
-                mono
-                type="number"
-                step="0.1"
-                min={ARTE_MIN_CM}
-                max={ARTE_MAX_CM}
-                placeholder="ex: 7"
-                value={arteHeightCm}
-                onChange={(e) => setArteHeightCm(e.target.value)}
-              />
+              <Input mono type="number" step="0.1" min={ARTE_MIN_CM} max={ARTE_MAX_CM} placeholder="ex: 7" value={arteHeightCm} onChange={(e) => setArteHeightCm(e.target.value)} />
             </label>
           </div>
           <label className="mt-3 block text-xs">
@@ -515,26 +524,13 @@ export default function CardGenerator({
               <option value="Carta">Carta (21,6 x 27,9 cm)</option>
             </select>
           </label>
-          <button
-            type="button"
-            onClick={handleCalcularGrid}
-            className="ix-btn-accent mt-3 w-full justify-center"
-          >
+          <button type="button" onClick={handleCalcularGrid} className="ix-btn-accent mt-3 w-full justify-center">
             <Icon name="sparkle" className="size-4" />
             Calcular grid automaticamente
           </button>
           {calcResultado && (
-            <div
-              className={`mt-3 rounded-xl px-3 py-2 text-xs font-medium ${
-                calcResultado.ok
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "bg-red-50 text-red-700"
-              }`}
-            >
-              <Icon
-                name={calcResultado.ok ? "success" : "x"}
-                className="mr-1 inline size-4 align-[-3px]"
-              />
+            <div className={`mt-3 rounded-xl px-3 py-2 text-xs font-medium ${calcResultado.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+              <Icon name={calcResultado.ok ? "success" : "x"} className="mr-1 inline size-4 align-[-3px]" />
               {calcResultado.mensagem}
             </div>
           )}
@@ -597,7 +593,6 @@ export default function CardGenerator({
             </button>
           </div>
         </Card>
-
       </div>
     </div>
   );
