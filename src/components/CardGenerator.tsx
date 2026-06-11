@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import Card from "@/components/ui/Card";
+import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
 import TemplateGallery, { TemplateItem } from "@/components/TemplateGallery";
 
@@ -352,8 +353,9 @@ export default function CardGenerator({
         </Card>
 
         <Card>
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">
-            📐 Tamanho da arte
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">
+            <Icon name="ruler" className="size-4 text-[#1847CC]" />
+            Tamanho da arte
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <label className="text-xs">
@@ -400,7 +402,8 @@ export default function CardGenerator({
             onClick={handleCalcularGrid}
             className="ix-btn-accent mt-3 w-full justify-center"
           >
-            ✨ Calcular grid automaticamente
+            <Icon name="sparkle" className="size-4" />
+            Calcular grid automaticamente
           </button>
           {calcResultado && (
             <div
@@ -410,7 +413,10 @@ export default function CardGenerator({
                   : "bg-red-50 text-red-700"
               }`}
             >
-              {calcResultado.ok ? "✅ " : "❌ "}
+              <Icon
+                name={calcResultado.ok ? "success" : "x"}
+                className="mr-1 inline size-4 align-[-3px]"
+              />
               {calcResultado.mensagem}
             </div>
           )}

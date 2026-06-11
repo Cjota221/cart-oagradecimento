@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
 
 type CheckoutResp = {
@@ -23,6 +24,13 @@ function formatBRL(value: number) {
   });
 }
 
+const resumoItens = [
+  "Acesso vitalício ao gerador",
+  "Templates premium em breve",
+  "Atualizações gratuitas pra sempre",
+  "Sem limite de impressões",
+];
+
 export default function CheckoutPage() {
   const router = useRouter();
   const [nome, setNome] = useState("");
@@ -36,9 +44,7 @@ export default function CheckoutPage() {
   const [statusPagamento, setStatusPagamento] = useState<string>("pending");
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const price = Number(
-    process.env.NEXT_PUBLIC_LIFETIME_PRICE_BRL || "19.9",
-  );
+  const price = Number(process.env.NEXT_PUBLIC_LIFETIME_PRICE_BRL || "19.9");
 
   const pararPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -66,7 +72,7 @@ export default function CheckoutPage() {
             }, 1500);
           }
         } catch {
-          // ignora — proximo tick tenta de novo
+          // Proximo tick tenta de novo.
         }
       }, 5000);
     },
@@ -120,7 +126,7 @@ export default function CheckoutPage() {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
     } catch {
-      // ignora
+      // Ignora falhas de clipboard.
     }
   }
 
@@ -131,7 +137,7 @@ export default function CheckoutPage() {
       <header className="border-b border-[#1847CC]/10 bg-white">
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-4 md:px-6">
           <Link href="/" className="flex items-center gap-2 font-extrabold text-[#16120E]">
-            <span className="text-2xl">🖨️</span>
+            <Icon name="printer" className="size-6 text-[#1847CC]" />
             <span className="text-xl tracking-tight">Imprimax</span>
           </Link>
           <Link
@@ -145,12 +151,11 @@ export default function CheckoutPage() {
 
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 md:px-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
-          {/* Formulario / PIX */}
           <div className="space-y-4">
             {!pix ? (
               <Card className="p-6">
                 <h1 className="text-2xl font-extrabold text-[#16120E] md:text-3xl">
-                  Garantir meu acesso vitalicio
+                  Garantir meu acesso vitalício
                 </h1>
                 <p className="mt-1 text-sm text-[#16120E]/70">
                   Preencha seus dados pra liberar o Imprimax assim que o PIX cair.
@@ -194,7 +199,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-[#16120E]/75">
-                      Senha (minimo 6 caracteres)
+                      Senha (mínimo 6 caracteres)
                     </label>
                     <Input
                       type="password"
@@ -210,14 +215,20 @@ export default function CheckoutPage() {
                     <p className="text-xs font-medium text-red-600">{erro}</p>
                   )}
 
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading
-                      ? "Gerando PIX..."
-                      : `Pagar ${formatBRL(price)} via PIX →`}
+                  <Button type="submit" className="w-full gap-2" disabled={loading}>
+                    {loading ? (
+                      "Gerando PIX..."
+                    ) : (
+                      <>
+                        {`Pagar ${formatBRL(price)} via PIX`}
+                        <Icon name="arrow-right" className="size-4" />
+                      </>
+                    )}
                   </Button>
 
-                  <p className="text-center text-xs text-[#16120E]/60">
-                    🔒 Pagamento seguro processado pelo Mercado Pago
+                  <p className="flex items-center justify-center gap-1.5 text-center text-xs text-[#16120E]/60">
+                    <Icon name="lock" className="size-3.5" />
+                    Pagamento seguro processado pelo Mercado Pago
                   </p>
                 </form>
               </Card>
@@ -225,7 +236,7 @@ export default function CheckoutPage() {
               <Card className="p-6">
                 {aprovado ? (
                   <div className="space-y-3 text-center">
-                    <div className="text-5xl">✅</div>
+                    <Icon name="success" className="mx-auto size-12 text-emerald-700" />
                     <h2 className="text-2xl font-extrabold text-emerald-700">
                       Pagamento confirmado!
                     </h2>
@@ -239,7 +250,7 @@ export default function CheckoutPage() {
                       Pague com PIX pra liberar
                     </h2>
                     <p className="mt-1 text-sm text-[#16120E]/70">
-                      Aponte a camera do seu app do banco pro QR code ou copie o codigo abaixo.
+                      Aponte a câmera do seu app do banco pro QR code ou copie o código abaixo.
                     </p>
 
                     {pix.qr_code_base64 ? (
@@ -270,16 +281,24 @@ export default function CheckoutPage() {
                         <button
                           type="button"
                           onClick={copiarCodigo}
-                          className="imprimax-btn w-full justify-center"
+                          className="imprimax-btn w-full justify-center gap-2"
                         >
-                          {copiado ? "✓ Copiado!" : "Copiar codigo PIX"}
+                          {copiado ? (
+                            <>
+                              <Icon name="copy-check" className="size-4" />
+                              Copiado!
+                            </>
+                          ) : (
+                            "Copiar codigo PIX"
+                          )}
                         </button>
                       </div>
                     ) : null}
 
                     <div className="mt-4 rounded-xl bg-[#FEFCF9] p-3 text-center text-sm">
-                      <p className="font-semibold text-[#1847CC]">
-                        ⏳ Aguardando pagamento...
+                      <p className="flex items-center justify-center gap-1.5 font-semibold text-[#1847CC]">
+                        <Icon name="clock" className="size-4" />
+                        Aguardando pagamento...
                       </p>
                       <p className="mt-1 text-xs text-[#16120E]/60">
                         Esta tela atualiza sozinha quando o PIX cair (uns 30s).
@@ -302,27 +321,28 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Resumo */}
           <Card className="h-fit p-6">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#F55028]">
               Resumo do pedido
             </h3>
             <div className="mt-4 flex items-start gap-3 rounded-xl bg-gradient-to-br from-[#1847CC]/10 to-[#F55028]/10 p-4">
-              <div className="text-3xl">🖨️</div>
+              <Icon name="printer" className="size-8 shrink-0 text-[#1847CC]" />
               <div className="flex-1">
                 <p className="text-sm font-bold text-[#16120E]">
-                  Imprimax — Acesso Vitalicio
+                  Imprimax — Acesso Vitalício
                 </p>
                 <p className="text-xs text-[#16120E]/70">
-                  Pagamento unico. Sem mensalidade.
+                  Pagamento único. Sem mensalidade.
                 </p>
               </div>
             </div>
             <ul className="mt-4 space-y-2 text-sm text-[#16120E]/80">
-              <li>✓ Acesso vitalicio ao gerador</li>
-              <li>✓ Templates premium (em breve)</li>
-              <li>✓ Atualizacoes gratuitas pra sempre</li>
-              <li>✓ Sem limite de impressoes</li>
+              {resumoItens.map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <Icon name="check" className="size-4 text-[#1847CC]" />
+                  {item}
+                </li>
+              ))}
             </ul>
             <div className="mt-5 border-t border-[#1847CC]/10 pt-4">
               <div className="flex items-center justify-between">

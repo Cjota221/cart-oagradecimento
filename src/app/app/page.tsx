@@ -1,10 +1,11 @@
 import Link from "next/link";
 import CardGenerator from "@/components/CardGenerator";
 import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icon";
 
 export default function AppPage() {
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col">
       <header className="no-print border-b border-white/20 bg-[#1847CC] text-white">
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-6">
           <Link href="/" className="block">
@@ -39,7 +40,10 @@ export default function AppPage() {
           </div>
           <div className="w-full max-w-xs">
             <Link href="/checkout">
-              <Button className="w-full">Comprar Acesso Vitalício →</Button>
+              <Button className="w-full gap-2">
+                Comprar Acesso Vitalício
+                <Icon name="arrow-right" className="size-4" />
+              </Button>
             </Link>
           </div>
         </section>

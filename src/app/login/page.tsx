@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 
@@ -21,7 +22,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(
     justSignedUp
-      ? "✅ Pagamento confirmado! Faça login com o email e senha que cadastrou."
+      ? "Pagamento confirmado! Faça login com o email e senha que cadastrou."
       : null,
   );
   const [messageType, setMessageType] = useState<"success" | "error">(
@@ -80,7 +81,8 @@ function LoginForm() {
           href="/"
           className="mb-3 flex items-center gap-2 text-sm font-bold text-[#16120E]"
         >
-          <span className="text-xl">🖨️</span> Imprimax
+          <Icon name="printer" className="size-5 text-[#1847CC]" />
+          Imprimax
         </Link>
         <h1 className="text-2xl font-extrabold text-[#16120E]">
           {mode === "login" ? "Entrar" : "Criar conta"}
@@ -93,12 +95,13 @@ function LoginForm() {
 
         {message && (
           <div
-            className={`mt-4 rounded-xl px-3 py-2 text-sm font-medium ${
+            className={`mt-4 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${
               messageType === "success"
                 ? "bg-emerald-50 text-emerald-700"
                 : "bg-red-50 text-red-600"
             }`}
           >
+            <Icon name={messageType === "success" ? "success" : "x"} className="size-4 shrink-0" />
             {message}
           </div>
         )}
@@ -159,9 +162,10 @@ function LoginForm() {
           {mode === "login" && (
             <Link
               href="/checkout"
-              className="font-semibold text-[#F55028] underline-offset-2 hover:underline"
+              className="inline-flex items-center gap-1 font-semibold text-[#F55028] underline-offset-2 hover:underline"
             >
-              Comprar acesso →
+              Comprar acesso
+              <Icon name="arrow-right" className="size-3.5" />
             </Link>
           )}
         </div>

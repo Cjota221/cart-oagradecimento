@@ -19,6 +19,18 @@ body {
     var(--ix-canvas);
 }
 
+.clean-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
 .app-alert {
   position: fixed;
   left: 50%;
@@ -128,7 +140,7 @@ body {
   color: rgba(22, 18, 14, 0.75);
 }
 
-.section-title i {
+.section-title .clean-icon {
   color: var(--ix-accent);
 }
 
@@ -261,7 +273,7 @@ body {
   font-weight: 600;
 }
 
-.upload-copy i {
+.upload-copy .clean-icon {
   font-size: 1.25rem;
   color: var(--ix-accent);
 }
