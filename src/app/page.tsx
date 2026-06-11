@@ -93,7 +93,7 @@ function ProductMockup() {
               <img
                 src="/brand/logo/logo%20principal.png"
                 alt="Imprimax"
-                className="h-9 w-auto rounded bg-white px-2 py-1"
+                className="h-12 w-auto rounded bg-white px-2 py-1"
               />
             </div>
 
@@ -154,7 +154,7 @@ export default function Home() {
             <img
               src="/brand/logo/logo%20principal.png"
               alt="Imprimax"
-              className="h-9 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-semibold text-[#16120E]/65 md:flex">
@@ -314,7 +314,13 @@ export default function Home() {
               <p className="mt-5 leading-8 text-white/72">
                 Ideal para quem vende produto fisico, embala pedidos e precisa imprimir material bonito sem depender de terceiros.
               </p>
-              <CtaButton className="mt-8 bg-white text-[#FF5028] hover:bg-[#FFF1EE]" />
+              <Link
+                href="/checkout"
+                className="sales-cta-glow mt-8 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3.5 text-sm font-extrabold text-[#FF5028] shadow-2xl transition hover:-translate-y-0.5 hover:bg-[#FFF1EE]"
+              >
+                Comprar acesso por R$19,90
+                <Icon name="arrow-right" className="size-4" />
+              </Link>
             </div>
 
             <div className="grid content-center gap-3">

@@ -28,9 +28,9 @@ export const metadata: Metadata = {
   description:
     "Upload da arte, configure o tamanho em cm e imprima frente/verso. Acesso vitalício.",
   icons: {
-    icon: "/brand/favicon/fivon.png",
-    shortcut: "/brand/favicon/fivon.png",
-    apple: "/brand/favicon/fivon.png",
+    icon: "/brand/favicon/fivon%20oficial.png",
+    shortcut: "/brand/favicon/fivon%20oficial.png",
+    apple: "/brand/favicon/fivon%20oficial.png",
   },
 };
 
