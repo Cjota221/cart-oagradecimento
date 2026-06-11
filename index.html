@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1847CC">
+  <meta name="theme-color" content="#FF5028">
   <title>Imprimax - Gerador de Cartões Profissional</title>
+  <link rel="icon" href="/brand/favicon/fivon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/brand/favicon/fivon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,9 +17,9 @@
           extend: {
             colors: {
               imprimax: {
-                primary: '#1847CC',
-                secondary: '#F55028',
-                background: '#FEFCF9',
+                primary: '#FF5028',
+                secondary: '#FF5028',
+                background: '#F7F7F7',
                 text: '#16120E',
                 accent: '#FFF1EE'
               }
@@ -26,7 +28,7 @@
               sans: ["'DM Sans'", 'sans-serif'], jakarta: ["'Plus Jakarta Sans'", 'sans-serif'], mono: ["'DM Mono'", 'monospace']
             },
             boxShadow: {
-              soft: '0 20px 45px -20px rgba(24, 71, 204, 0.35)'
+              soft: '0 20px 45px -20px rgba(255, 80, 40, 0.35)'
             }
           }
         }
@@ -69,7 +71,7 @@
 
   <div id="flip-modal" class="hidden fixed inset-0 z-[1000] bg-black/70 p-4 no-print">
     <div class="mx-auto flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-      <div class="bg-gradient-to-r from-[#1847CC] to-[#F55028] p-5 text-white">
+      <div class="bg-gradient-to-r from-[#FF5028] to-[#C83A18] p-5 text-white">
         <div class="flex items-start justify-between gap-4">
           <div>
             <h2 class="text-xl font-bold">Como virar a folha na impressora?</h2>
@@ -91,7 +93,7 @@
             </div>
             <h3 class="mt-4 text-base font-bold">Bandeja superior</h3>
             <p class="mt-2 text-sm text-imprimax-text/70">A folha entra por cima e sai por baixo.</p>
-            <div class="mt-4 rounded-2xl border border-[#1847CC]/10 bg-white p-4 text-sm text-imprimax-text/80">
+            <div class="mt-4 rounded-2xl border border-[#FF5028]/10 bg-white p-4 text-sm text-imprimax-text/80">
               Segure a folha com a face já impressa virada para baixo e o topo voltado para você.
             </div>
           </div>
@@ -101,14 +103,14 @@
             </div>
             <h3 class="mt-4 text-base font-bold">Gaveta inferior</h3>
             <p class="mt-2 text-sm text-imprimax-text/70">A folha sai no sentido de livro, sem espelhar a posição.</p>
-            <div class="mt-4 rounded-2xl border border-[#F55028]/10 bg-white p-4 text-sm text-imprimax-text/80">
+            <div class="mt-4 rounded-2xl border border-[#16120E]/10 bg-white p-4 text-sm text-imprimax-text/80">
               Reinsira a folha como se estivesse virando uma página, mantendo a referência do topo.
             </div>
           </div>
         </div>
         <div class="mt-5 rounded-2xl border border-imprimax-accent/30 bg-white p-4 shadow-sm">
           <div class="flex items-start gap-3">
-            <div class="mt-1 rounded-full bg-imprimax-accent/15 p-2 text-[#F55028]">
+            <div class="mt-1 rounded-full bg-imprimax-accent/15 p-2 text-[#FF5028]">
               <svg class="clean-icon"><use href="#icon-lightbulb"></use></svg>
             </div>
             <div>
@@ -132,14 +134,14 @@
     </div>
   </div>
 
-  <header class="no-print border-b border-white/20 bg-gradient-to-r from-[#1847CC] to-[#F55028] text-white shadow-soft">
+  <header class="no-print border-b border-white/20 bg-gradient-to-r from-[#FF5028] to-[#C83A18] text-white shadow-soft">
     <div class="mx-auto flex max-w-[1800px] flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
       <div class="flex items-center gap-3">
         <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-xl shadow-lg backdrop-blur">
           <svg class="clean-icon"><use href="#icon-grid"></use></svg>
         </div>
         <div>
-          <h1 class="text-2xl md:text-3xl" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.03em;">Imprimax</h1>
+          <img src="/brand/logo/logo%20principal.png" alt="Imprimax" class="h-12 w-auto rounded bg-white px-3 py-1.5 shadow-lg">
           <p class="text-sm text-white/85" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.03em;">Gerador de Cartões Profissional</p>
         </div>
       </div>
@@ -163,7 +165,7 @@
             <button id="btn-zoom-out" class="toolbar-icon" title="Diminuir zoom" type="button">
               <svg class="clean-icon"><use href="#icon-minus"></use></svg>
             </button>
-            <input id="zoom-slider" class="w-24 accent-[#1847CC]" type="range" min="20" max="150" value="50">
+            <input id="zoom-slider" class="w-24 accent-[#FF5028]" type="range" min="20" max="150" value="50">
             <span id="zoom-text" class="w-10 text-right text-xs font-semibold">50%</span>
             <button id="btn-zoom-in" class="toolbar-icon" title="Aumentar zoom" type="button">
               <svg class="clean-icon"><use href="#icon-plus"></use></svg>
@@ -184,7 +186,7 @@
       </div>
     </main>
 
-    <aside class="order-2 flex h-[54vh] w-full flex-col border-t border-white/40 bg-white shadow-[0_-4px_25px_-14px_rgba(24,71,204,0.35)] md:h-auto md:w-[400px] md:border-t-0 md:border-r">
+    <aside class="order-2 flex h-[54vh] w-full flex-col border-t border-white/40 bg-white shadow-[0_-4px_25px_-14px_rgba(255,80,40,0.35)] md:h-auto md:w-[400px] md:border-t-0 md:border-r">
       <div class="flex-1 overflow-y-auto p-5">
         <section class="mb-6">
           <h2 class="section-title"><svg class="clean-icon"><use href="#icon-grid"></use></svg>Suas artes</h2>
@@ -202,7 +204,7 @@
               </div>
               <img id="preview-img-front" class="upload-preview hidden" alt="Pré-visualização da frente">
               <div class="mt-3 flex items-center justify-center gap-2 text-[11px] text-slate-500">
-                <input id="rotate-front" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-[#1847CC]">
+                <input id="rotate-front" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-[#FF5028]">
                 <label for="rotate-front" class="cursor-pointer">Girar arte</label>
               </div>
             </label>
@@ -220,7 +222,7 @@
               </div>
               <img id="preview-img-back" class="upload-preview hidden" alt="Pré-visualização do verso">
               <div class="mt-3 flex items-center justify-center gap-2 text-[11px] text-slate-500">
-                <input id="rotate-back" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-[#1847CC]">
+                <input id="rotate-back" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-[#FF5028]">
                 <label for="rotate-back" class="cursor-pointer">Girar arte</label>
               </div>
             </label>
@@ -254,16 +256,16 @@
           </div>
         </section>
 
-        <section class="mb-6 rounded-3xl border border-[#1847CC]/10 bg-gradient-to-br from-white to-imprimax-background p-4">
-          <h3 class="text-sm font-bold text-imprimax-text"><svg class="clean-icon mr-2 text-[#1847CC]"><use href="#icon-ruler"></use></svg>Tamanho ideal do cartão</h3>
+        <section class="mb-6 rounded-3xl border border-[#FF5028]/10 bg-gradient-to-br from-white to-imprimax-background p-4">
+          <h3 class="text-sm font-bold text-imprimax-text"><svg class="clean-icon mr-2 text-[#FF5028]"><use href="#icon-ruler"></use></svg>Tamanho ideal do cartão</h3>
           <p class="mt-1 text-xs text-slate-600">Use esta medida ao criar a arte no Canva, Photoshop ou Illustrator.</p>
-          <div class="mt-3 rounded-2xl border border-[#1847CC]/10 bg-white p-3 text-center font-mono text-sm font-bold text-[#1847CC]" id="ideal-size-mm">-- mm x -- mm</div>
+          <div class="mt-3 rounded-2xl border border-[#FF5028]/10 bg-white p-3 text-center font-mono text-sm font-bold text-[#FF5028]" id="ideal-size-mm">-- mm x -- mm</div>
           <div class="mt-2 text-center text-[11px] font-medium text-slate-500" id="ideal-size-px">(-- px x -- px a 300 DPI)</div>
         </section>
 
         <section class="mb-6">
-          <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-[#1847CC]/30">
-            <input id="show-guidelines" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-[#1847CC]" checked>
+          <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-[#FF5028]/30">
+            <input id="show-guidelines" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-[#FF5028]" checked>
             <span>
               <span class="block text-sm font-semibold text-imprimax-text">Mostrar linhas de corte pontilhadas</span>
               <span class="block text-xs text-slate-500">Ajuda a visualizar a divisão dos cartões na folha.</span>

@@ -6,7 +6,7 @@ import Icon from "@/components/ui/Icon";
 export default function AppPage() {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="no-print border-b border-white/20 bg-[#1847CC] text-white">
+      <header className="no-print border-b border-white/20 bg-[#FF5028] text-white">
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-6">
           <Link href="/" className="block">
             <h1 className="text-3xl font-extrabold tracking-tight">Imprimax</h1>
@@ -29,7 +29,7 @@ export default function AppPage() {
       </header>
 
       <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-6 md:px-6">
-        <section className="no-print mb-6 grid gap-4 rounded-2xl border border-[#1847CC]/10 bg-white/90 p-5 md:grid-cols-[1fr_auto] md:items-center">
+        <section className="no-print mb-6 grid gap-4 rounded-2xl border border-[#FF5028]/10 bg-white/90 p-5 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <h2 className="text-2xl font-extrabold text-[#16120E] md:text-3xl">
               Crie, alinhe e imprima frente/verso sem dor de cabeça

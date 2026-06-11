@@ -37,7 +37,7 @@ export default function TemplateGallery({ templates, hasAccess, onSelect }: Prop
               >
                 <p className="text-sm font-semibold text-[#16120E]">{template.name}</p>
                 <p className="mt-1 text-xs text-[#16120E]/70">{template.category.replace("_", " ")}</p>
-                <p className="mt-2 text-xs font-medium text-[#F55028]">
+                <p className="mt-2 text-xs font-medium text-[#FF5028]">
                   {locked ? "Premium bloqueado" : "Disponível para carregar"}
                 </p>
               </button>

@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --ix-canvas:        #FEFCF9;
+  --ix-canvas:        #F7F7F7;
   --ix-ink:           #16120E;
-  --ix-brand:         #1847CC;
-  --ix-brand-dark:    #1038A8;
-  --ix-brand-soft:    #EEF2FC;
-  --ix-brand-border:  #C8D4F8;
-  --ix-accent:        #F55028;
-  --ix-accent-dark:   #D93D18;
+  --ix-brand:         #FF5028;
+  --ix-brand-dark:    #C83A18;
+  --ix-brand-soft:    #FFF1EE;
+  --ix-brand-border:  #FFD2C7;
+  --ix-accent:        #FF5028;
+  --ix-accent-dark:   #C83A18;
   --ix-accent-soft:   #FFF1EE;
-  --ix-accent-border: #F8C5B8;
+  --ix-accent-border: #FFD2C7;
   --ix-mid:           #9A948D;
   --ix-border:        #E6E2DC;
   --ix-surface:       #FFFFFF;
@@ -125,7 +125,283 @@ body {
 .card-grid { display: grid; width: 100%; height: 100%; }
 .card-tile { position: relative; overflow: hidden; display: flex; align-items: stretch; justify-content: stretch; }
 .card-tile img { width: 100%; height: 100%; object-fit: cover; }
-.card-tile-guides .card-tile { border: 1px dashed rgba(24, 71, 204, 0.2); }
+.card-tile-guides .card-tile { border: 1px dashed rgba(255, 80, 40, 0.2); }
+
+.sales-grid-bg {
+  background-image:
+    linear-gradient(rgba(22, 18, 14, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 18, 14, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+.sales-fade-in {
+  animation: sales-fade-in 700ms ease both;
+}
+
+.sales-float {
+  animation: sales-float 6s ease-in-out infinite;
+}
+
+.sales-progress {
+  animation: sales-progress 2.8s ease-in-out infinite;
+  transform-origin: left;
+}
+
+.sales-card-pop {
+  animation: sales-card-pop 2.8s ease-in-out infinite;
+}
+
+.sales-marquee {
+  animation: sales-marquee 30s linear infinite;
+}
+
+.sales-lift {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.sales-lift:hover {
+  border-color: rgba(255, 80, 40, 0.28);
+  box-shadow: 0 20px 45px rgba(22, 18, 14, 0.08);
+  transform: translateY(-3px);
+}
+
+.sales-cta-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.sales-cta-glow::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.32), transparent 55%);
+  transform: translateX(-120%);
+  animation: sales-cta-shine 3.4s ease-in-out infinite;
+}
+
+.sales-mockup-shell {
+  transform-style: preserve-3d;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.sales-mockup-shell:hover {
+  box-shadow: 0 30px 90px rgba(22, 18, 14, 0.2);
+  transform: perspective(1200px) rotateX(1.6deg) rotateY(-2deg);
+}
+
+.sales-sheen {
+  background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.42), transparent 58%);
+  mix-blend-mode: screen;
+  transform: translateX(-130%);
+  animation: sales-sheen 4.6s ease-in-out infinite;
+}
+
+.sales-pulse-badge {
+  animation: sales-pulse-badge 2.4s ease-in-out infinite;
+}
+
+.sales-card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.sales-card-shine::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(140deg, transparent, rgba(255, 80, 40, 0.12), transparent);
+  transform: translateY(-110%);
+  animation: sales-card-shine 3.2s ease-in-out infinite;
+}
+
+.sales-stat-strip {
+  position: relative;
+  overflow: hidden;
+}
+
+.sales-stat-strip::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 80, 40, 0.08), transparent);
+  transform: translateX(-100%);
+  animation: sales-stat-wash 5s ease-in-out infinite;
+}
+
+.sales-stat-cell {
+  position: relative;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.sales-stat-cell:hover {
+  background: #FFF1EE;
+  transform: translateY(-2px);
+}
+
+.sales-compare-row {
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.sales-compare-row:hover {
+  border-color: rgba(255, 80, 40, 0.3);
+  box-shadow: 0 18px 45px rgba(22, 18, 14, 0.07);
+  transform: translateX(3px);
+}
+
+.sales-offer-panel::before {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  content: "";
+  border: 1px solid rgba(255, 80, 40, 0.36);
+  border-radius: inherit;
+}
+
+.sales-scan {
+  animation: sales-scan 2.8s ease-in-out infinite;
+}
+
+@keyframes sales-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sales-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes sales-progress {
+  0%,
+  100% {
+    transform: scaleX(0.28);
+  }
+  50% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes sales-card-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+}
+
+@keyframes sales-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes sales-cta-shine {
+  0%,
+  55% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes sales-sheen {
+  0%,
+  58% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+@keyframes sales-pulse-badge {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.03);
+  }
+}
+
+@keyframes sales-card-shine {
+  0%,
+  60% {
+    transform: translateY(-110%);
+  }
+  100% {
+    transform: translateY(110%);
+  }
+}
+
+@keyframes sales-stat-wash {
+  0%,
+  60% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes sales-scan {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 0;
+    transform: translateY(320px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sales-fade-in,
+  .sales-float,
+  .sales-progress,
+  .sales-card-pop,
+  .sales-marquee,
+  .sales-cta-glow::after,
+  .sales-sheen,
+  .sales-pulse-badge,
+  .sales-card-shine::after,
+  .sales-stat-strip::before,
+  .sales-scan {
+    animation: none;
+  }
+}
 
 @media print {
   @page { margin: 0; }

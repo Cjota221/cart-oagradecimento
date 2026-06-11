@@ -285,13 +285,13 @@ export default function CardGenerator({
         <div className="no-print mb-3 flex items-center gap-2">
           <button
             onClick={() => setCurrentView("front")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#1847CC]/15 text-[#1847CC]" : "text-[#16120E]/60"}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "front" ? "bg-[#FF5028]/15 text-[#FF5028]" : "text-[#16120E]/60"}`}
           >
             Ver frente
           </button>
           <button
             onClick={() => setCurrentView("back")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "back" ? "bg-[#1847CC]/15 text-[#1847CC]" : "text-[#16120E]/60"}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${currentView === "back" ? "bg-[#FF5028]/15 text-[#FF5028]" : "text-[#16120E]/60"}`}
           >
             Ver verso
           </button>
@@ -349,12 +349,12 @@ export default function CardGenerator({
               <Input type="file" accept="image/*" onChange={(e) => onImageUpload(e, "back")} className="mt-1" />
             </label>
           </div>
-          {loadingSide && <p className="mt-2 text-xs text-[#F55028]">Carregando arte {loadingSide}...</p>}
+          {loadingSide && <p className="mt-2 text-xs text-[#16120E]">Carregando arte {loadingSide}...</p>}
         </Card>
 
         <Card>
           <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[#16120E]/70">
-            <Icon name="ruler" className="size-4 text-[#1847CC]" />
+            <Icon name="ruler" className="size-4 text-[#FF5028]" />
             Tamanho da arte
           </h3>
           <div className="grid grid-cols-2 gap-2">
@@ -388,7 +388,7 @@ export default function CardGenerator({
           <label className="mt-3 block text-xs">
             Formato do papel
             <select
-              className="mt-1 w-full rounded-xl border border-[#1847CC]/20 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-[#FF5028]/20 bg-white px-3 py-2 text-sm"
               value={paperFormat}
               onChange={(e) => setPaperFormat(e.target.value as PaperFormat)}
             >
@@ -441,7 +441,7 @@ export default function CardGenerator({
           <label className="mt-3 block text-xs">
             Orientação
             <select
-              className="mt-1 w-full rounded-xl border border-[#1847CC]/20 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-[#FF5028]/20 bg-white px-3 py-2 text-sm"
               value={orientation}
               onChange={(e) => setOrientation(e.target.value as Orientation)}
             >

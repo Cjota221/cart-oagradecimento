@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   title: "Imprimax — Imprima seus cartões em casa, sem designer",
   description:
     "Upload da arte, configure o tamanho em cm e imprima frente/verso. Acesso vitalício.",
+  icons: {
+    icon: "/brand/favicon/fivon.png",
+    shortcut: "/brand/favicon/fivon.png",
+    apple: "/brand/favicon/fivon.png",
+  },
 };
 
 export default function RootLayout({

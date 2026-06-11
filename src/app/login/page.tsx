@@ -81,7 +81,7 @@ function LoginForm() {
           href="/"
           className="mb-3 flex items-center gap-2 text-sm font-bold text-[#16120E]"
         >
-          <Icon name="printer" className="size-5 text-[#1847CC]" />
+          <Icon name="printer" className="size-5 text-[#FF5028]" />
           Imprimax
         </Link>
         <h1 className="text-2xl font-extrabold text-[#16120E]">
@@ -155,14 +155,14 @@ function LoginForm() {
           <button
             type="button"
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="font-semibold text-[#1847CC] underline-offset-2 hover:underline"
+            className="font-semibold text-[#FF5028] underline-offset-2 hover:underline"
           >
             {mode === "login" ? "Ainda não tenho conta" : "Já tenho conta"}
           </button>
           {mode === "login" && (
             <Link
               href="/checkout"
-              className="inline-flex items-center gap-1 font-semibold text-[#F55028] underline-offset-2 hover:underline"
+              className="inline-flex items-center gap-1 font-semibold text-[#FF5028] underline-offset-2 hover:underline"
             >
               Comprar acesso
               <Icon name="arrow-right" className="size-3.5" />

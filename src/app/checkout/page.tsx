@@ -134,15 +134,15 @@ export default function CheckoutPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-[#1847CC]/10 bg-white">
+      <header className="border-b border-[#FF5028]/10 bg-white">
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-4 md:px-6">
           <Link href="/" className="flex items-center gap-2 font-extrabold text-[#16120E]">
-            <Icon name="printer" className="size-6 text-[#1847CC]" />
+            <Icon name="printer" className="size-6 text-[#FF5028]" />
             <span className="text-xl tracking-tight">Imprimax</span>
           </Link>
           <Link
             href="/login"
-            className="text-sm font-semibold text-[#16120E]/70 hover:text-[#1847CC]"
+            className="text-sm font-semibold text-[#16120E]/70 hover:text-[#FF5028]"
           >
             Ja tenho conta
           </Link>
@@ -259,7 +259,7 @@ export default function CheckoutPage() {
                         <img
                           src={`data:image/png;base64,${pix.qr_code_base64}`}
                           alt="QR Code PIX"
-                          className="h-56 w-56 rounded-xl border border-[#1847CC]/10 bg-white p-2"
+                          className="h-56 w-56 rounded-xl border border-[#FF5028]/10 bg-white p-2"
                         />
                       </div>
                     ) : null}
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
                           readOnly
                           value={pix.qr_code}
                           rows={3}
-                          className="w-full rounded-xl border border-[#1847CC]/20 bg-white p-3 text-xs"
+                          className="w-full rounded-xl border border-[#FF5028]/20 bg-white p-3 text-xs"
                           onClick={(e) =>
                             (e.target as HTMLTextAreaElement).select()
                           }
@@ -295,8 +295,8 @@ export default function CheckoutPage() {
                       </div>
                     ) : null}
 
-                    <div className="mt-4 rounded-xl bg-[#FEFCF9] p-3 text-center text-sm">
-                      <p className="flex items-center justify-center gap-1.5 font-semibold text-[#1847CC]">
+                    <div className="mt-4 rounded-xl bg-[#F7F7F7] p-3 text-center text-sm">
+                      <p className="flex items-center justify-center gap-1.5 font-semibold text-[#FF5028]">
                         <Icon name="clock" className="size-4" />
                         Aguardando pagamento...
                       </p>
@@ -310,7 +310,7 @@ export default function CheckoutPage() {
                         href={pix.ticket_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 block text-center text-xs text-[#1847CC] underline-offset-2 hover:underline"
+                        className="mt-3 block text-center text-xs text-[#FF5028] underline-offset-2 hover:underline"
                       >
                         Ver detalhes no Mercado Pago
                       </a>
@@ -322,11 +322,11 @@ export default function CheckoutPage() {
           </div>
 
           <Card className="h-fit p-6">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#F55028]">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#FF5028]">
               Resumo do pedido
             </h3>
-            <div className="mt-4 flex items-start gap-3 rounded-xl bg-gradient-to-br from-[#1847CC]/10 to-[#F55028]/10 p-4">
-              <Icon name="printer" className="size-8 shrink-0 text-[#1847CC]" />
+            <div className="mt-4 flex items-start gap-3 rounded-xl bg-gradient-to-br from-[#FF5028]/10 to-[#C83A18]/10 p-4">
+              <Icon name="printer" className="size-8 shrink-0 text-[#FF5028]" />
               <div className="flex-1">
                 <p className="text-sm font-bold text-[#16120E]">
                   Imprimax — Acesso Vitalício
@@ -339,15 +339,15 @@ export default function CheckoutPage() {
             <ul className="mt-4 space-y-2 text-sm text-[#16120E]/80">
               {resumoItens.map((item) => (
                 <li key={item} className="flex items-center gap-2">
-                  <Icon name="check" className="size-4 text-[#1847CC]" />
+                  <Icon name="check" className="size-4 text-[#FF5028]" />
                   {item}
                 </li>
               ))}
             </ul>
-            <div className="mt-5 border-t border-[#1847CC]/10 pt-4">
+            <div className="mt-5 border-t border-[#FF5028]/10 pt-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-[#16120E]/70">Total</span>
-                <span className="text-2xl font-extrabold text-[#1847CC]">
+                <span className="text-2xl font-extrabold text-[#FF5028]">
                   {formatBRL(price)}
                 </span>
               </div>

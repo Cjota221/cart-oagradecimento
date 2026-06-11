@@ -1,10 +1,10 @@
 :root {
-  --ix-brand: #1847CC;
-  --ix-accent: #F55028;
-  --ix-canvas: #FEFCF9;
+  --ix-brand: #FF5028;
+  --ix-accent: #FF5028;
+  --ix-canvas: #F7F7F7;
   --ix-ink: #16120E;
   --ix-accent-soft: #FFF1EE;
-  --ix-header: linear-gradient(90deg, #1847CC 0%, #F55028 100%);
+  --ix-header: linear-gradient(90deg, #FF5028 0%, #C83A18 100%);
 }
 
 html, body {
@@ -14,8 +14,8 @@ html, body {
 
 body {
   background:
-    radial-gradient(circle at top left, rgba(245, 80, 40, 0.08), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(24, 71, 204, 0.12), transparent 32%),
+    radial-gradient(circle at top left, rgba(22, 18, 14, 0.08), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(255, 80, 40, 0.12), transparent 32%),
     var(--ix-canvas);
 }
 
@@ -53,15 +53,15 @@ body {
 }
 
 .app-alert.success {
-  background: linear-gradient(135deg, rgba(24, 71, 204, 0.97), rgba(245, 80, 40, 0.97));
+  background: linear-gradient(135deg, rgba(255, 80, 40, 0.97), rgba(22, 18, 14, 0.97));
 }
 
 .app-alert.error {
-  background: linear-gradient(135deg, rgba(165, 23, 23, 0.97), rgba(24, 71, 204, 0.97));
+  background: linear-gradient(135deg, rgba(165, 23, 23, 0.97), rgba(255, 80, 40, 0.97));
 }
 
 .app-alert.warning {
-  background: linear-gradient(135deg, rgba(184, 92, 0, 0.97), rgba(245, 80, 40, 0.97));
+  background: linear-gradient(135deg, rgba(184, 92, 0, 0.97), rgba(22, 18, 14, 0.97));
 }
 
 .print-helper-card {
@@ -69,10 +69,10 @@ body {
   flex-direction: column;
   gap: 0.75rem;
   border-radius: 1.25rem;
-  border: 1px solid rgba(245, 80, 40, 0.25);
+  border: 1px solid rgba(22, 18, 14, 0.25);
   background: rgba(255, 255, 255, 0.96);
   padding: 1rem;
-  box-shadow: 0 24px 48px rgba(24, 71, 204, 0.2);
+  box-shadow: 0 24px 48px rgba(255, 80, 40, 0.2);
 }
 
 .preview-toolbar {
@@ -89,7 +89,7 @@ body {
   background: rgba(255, 255, 255, 0.9);
   padding: 0.75rem 0.9rem;
   backdrop-filter: blur(10px);
-  box-shadow: 0 16px 35px rgba(24, 71, 204, 0.12);
+  box-shadow: 0 16px 35px rgba(255, 80, 40, 0.12);
 }
 
 .view-toggle,
@@ -110,14 +110,14 @@ body {
 }
 
 .view-toggle.active {
-  background: linear-gradient(135deg, rgba(24, 71, 204, 0.12), rgba(245, 80, 40, 0.12));
+  background: linear-gradient(135deg, rgba(255, 80, 40, 0.12), rgba(22, 18, 14, 0.12));
   color: var(--ix-brand);
 }
 
 .toolbar-icon {
   height: 2rem;
   width: 2rem;
-  border: 1px solid rgba(24, 71, 204, 0.12);
+  border: 1px solid rgba(255, 80, 40, 0.12);
   background: #fff;
   color: var(--ix-brand);
 }
@@ -125,7 +125,7 @@ body {
 .toolbar-icon:hover,
 .view-toggle:hover {
   transform: translateY(-1px);
-  background-color: rgba(24, 71, 204, 0.08);
+  background-color: rgba(255, 80, 40, 0.08);
 }
 
 .section-title {
@@ -147,7 +147,7 @@ body {
 .imprimax-input {
   width: 100%;
   border-radius: 0.9rem;
-  border: 1px solid rgba(24, 71, 204, 0.14);
+  border: 1px solid rgba(255, 80, 40, 0.14);
   background: white;
   padding: 0.7rem 0.85rem;
   font-size: 0.92rem;
@@ -157,8 +157,8 @@ body {
 }
 
 .imprimax-input:focus {
-  border-color: rgba(24, 71, 204, 0.55);
-  box-shadow: 0 0 0 4px rgba(24, 71, 204, 0.08);
+  border-color: rgba(255, 80, 40, 0.55);
+  box-shadow: 0 0 0 4px rgba(255, 80, 40, 0.08);
 }
 
 .form-label {
@@ -185,7 +185,7 @@ body {
 .imprimax-btn-primary {
   background: linear-gradient(135deg, var(--ix-brand), var(--ix-accent));
   color: #fff;
-  box-shadow: 0 18px 28px -18px rgba(24, 71, 204, 0.75);
+  box-shadow: 0 18px 28px -18px rgba(255, 80, 40, 0.75);
 }
 
 .imprimax-btn-success {
@@ -195,7 +195,7 @@ body {
 }
 
 .imprimax-btn-secondary {
-  border: 1px solid rgba(24, 71, 204, 0.18);
+  border: 1px solid rgba(255, 80, 40, 0.18);
   background: white;
   color: var(--ix-ink);
 }
@@ -208,10 +208,10 @@ body {
 
 .guide-card {
   border-radius: 1.5rem;
-  border: 1px solid rgba(24, 71, 204, 0.12);
+  border: 1px solid rgba(255, 80, 40, 0.12);
   background: linear-gradient(180deg, #fff, #fcf8ff);
   padding: 1.25rem;
-  box-shadow: 0 14px 35px rgba(24, 71, 204, 0.08);
+  box-shadow: 0 14px 35px rgba(255, 80, 40, 0.08);
 }
 
 .guide-icon {
@@ -221,7 +221,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(24, 71, 204, 0.16), rgba(245, 80, 40, 0.16));
+  background: linear-gradient(135deg, rgba(255, 80, 40, 0.16), rgba(22, 18, 14, 0.16));
   color: var(--ix-brand);
   font-size: 1.15rem;
 }
@@ -232,9 +232,9 @@ body {
   cursor: pointer;
   overflow: hidden;
   border-radius: 1.4rem;
-  border: 1px dashed rgba(24, 71, 204, 0.26);
+  border: 1px dashed rgba(255, 80, 40, 0.26);
   background:
-    radial-gradient(circle at top right, rgba(245, 80, 40, 0.09), transparent 26%),
+    radial-gradient(circle at top right, rgba(22, 18, 14, 0.09), transparent 26%),
     linear-gradient(180deg, #fff, #fbf8ff);
   padding: 1rem;
   text-align: center;
@@ -243,8 +243,8 @@ body {
 
 .upload-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(245, 80, 40, 0.4);
-  box-shadow: 0 16px 30px rgba(24, 71, 204, 0.09);
+  border-color: rgba(22, 18, 14, 0.4);
+  box-shadow: 0 16px 30px rgba(255, 80, 40, 0.09);
 }
 
 .upload-badge {
@@ -252,7 +252,7 @@ body {
   top: 0.8rem;
   right: 0.8rem;
   border-radius: 999px;
-  background: rgba(24, 71, 204, 0.08);
+  background: rgba(255, 80, 40, 0.08);
   padding: 0.25rem 0.6rem;
   font-size: 0.67rem;
   font-weight: 800;
@@ -283,7 +283,7 @@ body {
   max-height: 4.5rem;
   width: auto;
   border-radius: 0.9rem;
-  border: 1px solid rgba(24, 71, 204, 0.12);
+  border: 1px solid rgba(255, 80, 40, 0.12);
   object-fit: cover;
 }
 
@@ -304,17 +304,17 @@ body {
   height: 0.9rem;
   width: 0.9rem;
   border-radius: 999px;
-  border: 2px solid rgba(245, 80, 40, 0.22);
+  border: 2px solid rgba(22, 18, 14, 0.22);
   border-top-color: var(--ix-accent);
   animation: spin 0.8s linear infinite;
 }
 
 .art-category {
   border-radius: 1.35rem;
-  border: 1px solid rgba(24, 71, 204, 0.1);
+  border: 1px solid rgba(255, 80, 40, 0.1);
   background: #fff;
   padding: 0.85rem;
-  box-shadow: 0 12px 24px rgba(24, 71, 204, 0.05);
+  box-shadow: 0 12px 24px rgba(255, 80, 40, 0.05);
 }
 
 .art-category-header {
@@ -330,7 +330,7 @@ body {
 
 .art-category-header small {
   border-radius: 999px;
-  background: rgba(245, 80, 40, 0.09);
+  background: rgba(22, 18, 14, 0.09);
   padding: 0.22rem 0.55rem;
   font-size: 0.68rem;
   color: var(--ix-accent);
@@ -339,9 +339,9 @@ body {
 .art-card {
   width: 100%;
   border-radius: 1.15rem;
-  border: 1px solid rgba(24, 71, 204, 0.12);
+  border: 1px solid rgba(255, 80, 40, 0.12);
   background:
-    linear-gradient(135deg, rgba(24, 71, 204, 0.95), rgba(245, 80, 40, 0.92)),
+    linear-gradient(135deg, rgba(255, 80, 40, 0.95), rgba(22, 18, 14, 0.92)),
     #fff;
   padding: 1rem;
   text-align: left;
@@ -351,7 +351,7 @@ body {
 
 .art-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 32px rgba(24, 71, 204, 0.18);
+  box-shadow: 0 18px 32px rgba(255, 80, 40, 0.18);
 }
 
 .art-card-badge {
@@ -423,7 +423,7 @@ body {
 }
 
 .show-guidelines .card-item-wrapper {
-  border: 1px dashed rgba(24, 71, 204, 0.22);
+  border: 1px dashed rgba(255, 80, 40, 0.22);
 }
 
 .card-placeholder {
