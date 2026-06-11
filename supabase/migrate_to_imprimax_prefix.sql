@@ -47,6 +47,10 @@ alter table if exists public.imprimax_profiles enable row level security;
 alter table if exists public.imprimax_payments enable row level security;
 alter table if exists public.imprimax_templates enable row level security;
 
+-- Garante a flag usada pelo painel admin.
+alter table if exists public.imprimax_profiles
+  add column if not exists is_admin boolean default false;
+
 -- Recria policies com prefixo.
 do $$
 begin

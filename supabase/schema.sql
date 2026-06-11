@@ -7,6 +7,7 @@ create table if not exists public.imprimax_profiles (
   email text,
   name text,
   has_access boolean default false,
+  is_admin boolean default false,
   paid_at timestamptz,
   created_at timestamptz default now()
 );
