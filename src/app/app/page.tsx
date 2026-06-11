@@ -9,7 +9,11 @@ export default function AppPage() {
       <header className="no-print border-b border-white/20 bg-[#FF5028] text-white">
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-6">
           <Link href="/" className="block">
-            <h1 className="text-3xl font-extrabold tracking-tight">Imprimax</h1>
+            <img
+              src="/brand/logo/logo%20principal.png"
+              alt="Imprimax"
+              className="h-[58px] w-auto rounded bg-white px-3 py-1.5 shadow-lg"
+            />
             <p className="mt-1 text-sm text-white/90">Gerador de Cartões Profissional</p>
           </Link>
           <div className="flex items-center gap-2">

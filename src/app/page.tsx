@@ -93,7 +93,7 @@ function ProductMockup() {
               <img
                 src="/brand/logo/logo%20principal.png"
                 alt="Imprimax"
-                className="h-12 w-auto rounded bg-white px-2 py-1"
+                className="h-[58px] w-auto rounded bg-white px-2 py-1"
               />
             </div>
 
@@ -154,7 +154,7 @@ export default function Home() {
             <img
               src="/brand/logo/logo%20principal.png"
               alt="Imprimax"
-              className="h-12 w-auto"
+              className="h-[58px] w-auto"
             />
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-semibold text-[#16120E]/65 md:flex">
