@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import CardGenerator from "@/components/CardGenerator";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getSupabaseServiceClient } from "@/lib/supabase-service";
 import type { TemplateItem, KitItem, ColecaoItem } from "@/components/TemplateGallery";
 
 export default async function DashboardPage() {
@@ -28,7 +29,9 @@ export default async function DashboardPage() {
 
   const templates = (templatesRaw || []) as TemplateItem[];
 
-  const { data: kitsRaw } = await supabase
+  const serviceClient = getSupabaseServiceClient();
+
+  const { data: kitsRaw } = await serviceClient
     .from("imprimax_kits")
     .select(`
       id, name, description, nicho, cover_url, is_free,
@@ -53,13 +56,16 @@ export default async function DashboardPage() {
       .filter(Boolean),
   }));
 
-  const { data: colecoesRaw } = await supabase
+  const { data: colecoesRaw } = await serviceClient
     .from("imprimax_colecoes")
     .select(`
       id, name, description, cover_url,
       imprimax_colecao_templates (
         sort_order,
-        imprimax_templates ( id, name, category, nicho, front_url, back_url, is_free )
+        imprimax_templates (
+          id, name, category, nicho,
+          front_url, back_url, is_free
+        )
       )
     `)
     .eq("is_active", true)
