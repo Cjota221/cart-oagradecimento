@@ -319,11 +319,14 @@ export default function CardGenerator({
     if (side === "back" && !backImage) return showMessage("Adicione a arte do verso antes de imprimir.");
     setCurrentView(side);
 
-    // Injeta o tamanho correto da página para o browser respeitar
-    const pageStyle = document.createElement("style");
-    pageStyle.id = "imprimax-print-page";
-    const size = orientation === "landscape" ? "297mm 210mm" : "210mm 297mm";
-    pageStyle.textContent = `@page { size: ${size}; margin: 0; }`;
+    // Injeta (ou reutiliza) o tamanho correto da página para o browser respeitar
+    const pageStyle =
+      (document.getElementById("dynamic-print-page-style") as HTMLStyleElement | null) ||
+      document.createElement("style");
+    pageStyle.id = "dynamic-print-page-style";
+    pageStyle.textContent = orientation === "landscape"
+      ? "@page { size: A4 landscape; margin: 0; }"
+      : "@page { size: A4 portrait; margin: 0; }";
     document.head.appendChild(pageStyle);
 
     window.setTimeout(() => {
@@ -332,7 +335,7 @@ export default function CardGenerator({
       if (zoomEl) zoomEl.style.transform = "none";
       const restore = () => {
         if (zoomEl) zoomEl.style.transform = oldTransform;
-        const injected = document.getElementById("imprimax-print-page");
+        const injected = document.getElementById("dynamic-print-page-style");
         if (injected) document.head.removeChild(injected);
         window.removeEventListener("afterprint", restore);
       };

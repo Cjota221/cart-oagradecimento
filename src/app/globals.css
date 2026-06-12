@@ -414,6 +414,8 @@ body {
 @media print {
   @page { margin: 0; }
   html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  body { margin: 0 !important; padding: 0 !important; }
+  .a4-sheet { margin: 0 !important; }
 
   /* Esconde tudo e mostra só a folha A4 */
   body { visibility: hidden; }
