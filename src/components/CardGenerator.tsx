@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import Card from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
-import TemplateGallery, { TemplateItem, KitItem } from "@/components/TemplateGallery";
+import TemplateGallery, { TemplateItem, KitItem, ColecaoItem } from "@/components/TemplateGallery";
 
 const PAGE_PADDING_MM = 20;
 
@@ -28,6 +28,7 @@ type Props = {
   enableTemplates?: boolean;
   templates?: TemplateItem[];
   kits?: KitItem[];
+  colecoes?: ColecaoItem[];
   hasAccess?: boolean;
 };
 
@@ -107,6 +108,7 @@ export default function CardGenerator({
   enableTemplates = false,
   templates = [],
   kits = [],
+  colecoes = [],
   hasAccess = false,
 }: Props) {
   const [frontImage, setFrontImage] = useState<string | null>(null);
@@ -367,6 +369,7 @@ export default function CardGenerator({
             <TemplateGallery
               templates={templates}
               kits={kits}
+              colecoes={colecoes}
               hasAccess={hasAccess}
               selectedTemplateId={selectedTemplateId}
               onSelect={handleTemplateSelect}

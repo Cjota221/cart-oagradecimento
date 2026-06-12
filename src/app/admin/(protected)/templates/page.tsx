@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { TEMPLATE_CATEGORIES, NICHOS } from "@/lib/imprimax-constants";
 
-type AdminTab = "templates" | "kits";
+type AdminTab = "templates" | "kits" | "colecoes";
 
 interface TemplateItem {
   id: string;
@@ -28,6 +28,25 @@ interface KitAdminItem {
   sort_order: number;
   templates: TemplateItem[];
 }
+
+interface ColecaoAdminItem {
+  id: string;
+  name: string;
+  description: string | null;
+  cover_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  templates: TemplateItem[];
+}
+
+const EMPTY_COLECAO_FORM = {
+  name: "",
+  description: "",
+  cover_url: "",
+  is_active: true,
+  sort_order: 0,
+  template_ids: [] as string[],
+};
 
 const EMPTY_FORM = {
   name: "",
@@ -81,6 +100,14 @@ export default function AdminTemplatesPage() {
   const [savingKit, setSavingKit] = useState(false);
   const [kitForm, setKitForm] = useState({ ...EMPTY_KIT_FORM });
 
+  // ── Coleções state ──
+  const [colecoes, setColecoes] = useState<ColecaoAdminItem[]>([]);
+  const [loadingColecoes, setLoadingColecoes] = useState(false);
+  const [showColecaoForm, setShowColecaoForm] = useState(false);
+  const [editingColecao, setEditingColecao] = useState<ColecaoAdminItem | null>(null);
+  const [savingColecao, setSavingColecao] = useState(false);
+  const [colecaoForm, setColecaoForm] = useState({ ...EMPTY_COLECAO_FORM });
+
   // ── Data loading ──
   async function loadTemplates() {
     setLoading(true);
@@ -98,10 +125,19 @@ export default function AdminTemplatesPage() {
     setLoadingKits(false);
   }
 
+  async function loadColecoes() {
+    setLoadingColecoes(true);
+    const res = await fetch("/api/admin/colecoes");
+    const json = await res.json();
+    setColecoes(json.colecoes ?? []);
+    setLoadingColecoes(false);
+  }
+
   useEffect(() => { loadTemplates(); }, []);
 
   useEffect(() => {
     if (activeTab === "kits" && kits.length === 0) loadKits();
+    if (activeTab === "colecoes" && colecoes.length === 0) loadColecoes();
   }, [activeTab]);
 
   // ── Template CRUD ──
@@ -269,6 +305,76 @@ export default function AdminTemplatesPage() {
     }));
   }
 
+  // ── Coleções CRUD ──
+  function openNewColecao() {
+    setEditingColecao(null);
+    setColecaoForm({ ...EMPTY_COLECAO_FORM });
+    setShowColecaoForm(true);
+  }
+
+  function openEditColecao(c: ColecaoAdminItem) {
+    setEditingColecao(c);
+    setColecaoForm({
+      name: c.name,
+      description: c.description ?? "",
+      cover_url: c.cover_url ?? "",
+      is_active: c.is_active,
+      sort_order: c.sort_order ?? 0,
+      template_ids: (c.templates || []).map((t) => t.id),
+    });
+    setShowColecaoForm(true);
+  }
+
+  function closeColecaoForm() {
+    setShowColecaoForm(false);
+    setEditingColecao(null);
+    setColecaoForm({ ...EMPTY_COLECAO_FORM });
+  }
+
+  async function handleDeleteColecao(c: ColecaoAdminItem) {
+    if (!window.confirm(`Excluir a coleção "${c.name}"?`)) return;
+    await fetch(`/api/admin/colecoes?id=${c.id}`, { method: "DELETE" });
+    setColecoes((prev) => prev.filter((x) => x.id !== c.id));
+  }
+
+  async function handleSaveColecao() {
+    if (!colecaoForm.name) { alert("Nome da coleção é obrigatório."); return; }
+    setSavingColecao(true);
+    const body = {
+      name: colecaoForm.name,
+      description: colecaoForm.description || null,
+      cover_url: colecaoForm.cover_url || null,
+      is_active: colecaoForm.is_active,
+      sort_order: colecaoForm.sort_order,
+      template_ids: colecaoForm.template_ids,
+    };
+    if (editingColecao) {
+      await fetch("/api/admin/colecoes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editingColecao.id, ...body }),
+      });
+    } else {
+      await fetch("/api/admin/colecoes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    }
+    setSavingColecao(false);
+    closeColecaoForm();
+    loadColecoes();
+  }
+
+  function toggleTemplateInColecao(tid: string) {
+    setColecaoForm((prev) => ({
+      ...prev,
+      template_ids: prev.template_ids.includes(tid)
+        ? prev.template_ids.filter((x) => x !== tid)
+        : [...prev.template_ids, tid],
+    }));
+  }
+
   const total = templates.length;
   const ativos = templates.filter((t) => t.is_active).length;
   const gratuitos = templates.filter((t) => t.is_free).length;
@@ -277,7 +383,7 @@ export default function AdminTemplatesPage() {
     <div>
       {/* Tabs */}
       <div style={{ display: "flex", gap: "8px", marginBottom: "28px", borderBottom: "1px solid #E8E5E1", paddingBottom: "0" }}>
-        {(["templates", "kits"] as AdminTab[]).map((tab) => (
+        {(["templates", "kits", "colecoes"] as AdminTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -294,7 +400,7 @@ export default function AdminTemplatesPage() {
               marginBottom: "-1px",
             }}
           >
-            {tab === "templates" ? "Templates" : "Kits"}
+            {tab === "templates" ? "Templates" : tab === "kits" ? "Kits" : "Coleções"}
           </button>
         ))}
       </div>
@@ -613,6 +719,135 @@ export default function AdminTemplatesPage() {
                   </button>
                   <button onClick={handleSaveKit} disabled={savingKit} style={{ background: savingKit ? "#9A948D" : "#FF5028", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 18px", fontWeight: 700, fontSize: "14px", cursor: savingKit ? "not-allowed" : "pointer" }}>
                     {savingKit ? "Salvando..." : "Salvar kit"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── COLEÇÕES TAB ── */}
+      {activeTab === "colecoes" && (
+        <>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px", gap: "16px", flexWrap: "wrap" }}>
+            <div>
+              <h1 style={{ fontFamily: "var(--font-jakarta), sans-serif", fontWeight: 800, fontSize: "28px", color: "#16120E", margin: 0 }}>
+                Coleções
+              </h1>
+              <p style={{ marginTop: "6px", fontSize: "13px", color: "#9A948D" }}>
+                {colecoes.length} coleções cadastradas — agrupamento por tema visual
+              </p>
+            </div>
+            <button onClick={openNewColecao} style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 18px", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}>
+              + Nova coleção
+            </button>
+          </div>
+
+          {loadingColecoes && <p style={{ color: "#9A948D", fontSize: "14px" }}>Carregando coleções...</p>}
+
+          {!loadingColecoes && colecoes.length === 0 && (
+            <div style={{ textAlign: "center", padding: "80px 24px", background: "#fff", borderRadius: "12px", border: "1px solid #E8E5E1" }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>🎨</div>
+              <p style={{ fontFamily: "var(--font-jakarta), sans-serif", fontWeight: 700, fontSize: "18px", color: "#16120E", margin: 0 }}>
+                Nenhuma coleção ainda
+              </p>
+              <p style={{ marginTop: "8px", fontSize: "14px", color: "#9A948D" }}>
+                Agrupe templates com tema visual semelhante (ex: Coleção Floral, Coleção Minimalista).
+              </p>
+            </div>
+          )}
+
+          {!loadingColecoes && colecoes.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "16px" }}>
+              {colecoes.map((c) => (
+                <div key={c.id} style={{ background: "#fff", border: "1px solid #E8E5E1", borderRadius: "12px", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div>
+                    <p style={{ fontFamily: "var(--font-jakarta), sans-serif", fontWeight: 700, fontSize: "15px", color: "#16120E", margin: 0 }}>{c.name}</p>
+                    <div style={{ display: "flex", gap: "6px", marginTop: "6px", flexWrap: "wrap" }}>
+                      <span style={{ background: "#EDE9FE", color: "#6D28D9", borderRadius: "4px", padding: "2px 8px", fontSize: "11px", fontWeight: 600 }}>
+                        {(c.templates || []).length} templates
+                      </span>
+                      {!c.is_active && (
+                        <span style={{ background: "#FEE2E2", color: "#DC2626", borderRadius: "4px", padding: "2px 8px", fontSize: "11px", fontWeight: 600 }}>Inativo</span>
+                      )}
+                    </div>
+                    {c.description && <p style={{ marginTop: "6px", fontSize: "12px", color: "#9A948D" }}>{c.description}</p>}
+                  </div>
+                  {/* Miniaturas dos templates */}
+                  {(c.templates || []).length > 0 && (
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                      {(c.templates || []).slice(0, 6).map((t) => (
+                        <img key={t.id} src={t.front_url} alt={t.name} style={{ width: "40px", height: "50px", objectFit: "cover", borderRadius: "4px", border: "1px solid #E8E5E1" }} />
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                    <button onClick={() => openEditColecao(c)} style={{ background: "transparent", border: "1px solid #E8E5E1", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", fontWeight: 600, color: "#16120E", cursor: "pointer" }}>
+                      Editar
+                    </button>
+                    <button onClick={() => handleDeleteColecao(c)} style={{ background: "transparent", border: "1px solid #FECACA", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", fontWeight: 600, color: "#DC2626", cursor: "pointer" }}>
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Modal coleção */}
+          {showColecaoForm && (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(22,18,14,0.5)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+              onClick={(e) => { if (e.target === e.currentTarget) closeColecaoForm(); }}>
+              <div style={{ background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "600px", maxHeight: "90vh", overflowY: "auto", padding: "28px" }}>
+                <h2 style={{ fontFamily: "var(--font-jakarta), sans-serif", fontWeight: 800, fontSize: "20px", color: "#16120E", margin: "0 0 20px" }}>
+                  {editingColecao ? "Editar coleção" : "Nova coleção"}
+                </h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#16120E", marginBottom: "6px" }}>Nome *</label>
+                    <input type="text" value={colecaoForm.name} onChange={(e) => setColecaoForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ex: Coleção Floral Primavera" style={INPUT_STYLE} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#16120E", marginBottom: "6px" }}>Descrição <span style={{ fontWeight: 400, color: "#9A948D" }}>(opcional)</span></label>
+                    <input type="text" value={colecaoForm.description} onChange={(e) => setColecaoForm((p) => ({ ...p, description: e.target.value }))} placeholder="Ex: Designs com motivos florais e cores suaves" style={INPUT_STYLE} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#16120E", marginBottom: "6px" }}>Ordem de exibição</label>
+                    <input type="number" min={0} value={colecaoForm.sort_order} onChange={(e) => setColecaoForm((p) => ({ ...p, sort_order: Number(e.target.value) }))} style={INPUT_STYLE} />
+                  </div>
+                  <div style={{ display: "flex", gap: "20px" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#16120E", fontWeight: 500 }}>
+                      <input type="checkbox" checked={colecaoForm.is_active} onChange={(e) => setColecaoForm((p) => ({ ...p, is_active: e.target.checked }))} style={{ accentColor: "#7C3AED", width: "16px", height: "16px" }} />
+                      Ativa (visível na galeria)
+                    </label>
+                  </div>
+                  {/* Seleção de templates */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#16120E", marginBottom: "10px" }}>
+                      Templates da coleção <span style={{ fontWeight: 400, color: "#9A948D" }}>({colecaoForm.template_ids.length} selecionados)</span>
+                    </label>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px", maxHeight: "280px", overflowY: "auto", padding: "4px" }}>
+                      {templates.filter((t) => t.is_active).map((t) => {
+                        const selected = colecaoForm.template_ids.includes(t.id);
+                        return (
+                          <button key={t.id} type="button" onClick={() => toggleTemplateInColecao(t.id)} style={{ background: selected ? "#F5F3FF" : "#FAFAFA", border: selected ? "1.5px solid #7C3AED" : "1px solid #E8E5E1", borderRadius: "8px", padding: "4px", cursor: "pointer", textAlign: "left" }}>
+                            <img src={t.front_url} alt={t.name} style={{ width: "100%", aspectRatio: "4/5", objectFit: "cover", borderRadius: "4px", display: "block" }} />
+                            <p style={{ fontSize: "10px", fontWeight: 600, color: selected ? "#7C3AED" : "#16120E", margin: "4px 2px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {t.name}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "10px", marginTop: "24px", justifyContent: "flex-end" }}>
+                  <button onClick={closeColecaoForm} style={{ background: "transparent", border: "1px solid #E8E5E1", borderRadius: "8px", padding: "10px 18px", fontWeight: 600, fontSize: "14px", color: "#16120E", cursor: "pointer" }}>
+                    Cancelar
+                  </button>
+                  <button onClick={handleSaveColecao} disabled={savingColecao} style={{ background: savingColecao ? "#9A948D" : "#7C3AED", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 18px", fontWeight: 700, fontSize: "14px", cursor: savingColecao ? "not-allowed" : "pointer" }}>
+                    {savingColecao ? "Salvando..." : "Salvar coleção"}
                   </button>
                 </div>
               </div>
